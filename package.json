@@ -20,5 +20,10 @@
   "bugs": {
     "url": "https://github.com/concept-not-found/deft/issues"
   },
-  "homepage": "https://github.com/concept-not-found/deft#readme"
+  "homepage": "https://github.com/concept-not-found/deft#readme",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "jest": "20.0.4"
+  }
 }
