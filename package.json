@@ -1,0 +1,24 @@
+{
+  "name": "deft",
+  "version": "0.0.1",
+  "description": "Safe subset of JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/concept-not-found/deft.git"
+  },
+  "keywords": [
+    "pure",
+    "functional",
+    "safe"
+  ],
+  "author": "Ronald Chen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/concept-not-found/deft/issues"
+  },
+  "homepage": "https://github.com/concept-not-found/deft#readme"
+}
