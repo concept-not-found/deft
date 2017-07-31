@@ -26,9 +26,9 @@ module.exports = ParserFactory({
       '"',
     ],
     [
-      "'",
+      '\'',
       /a-zA-Z/,
-      "'"
+      '\''
     ]
   ),
 
