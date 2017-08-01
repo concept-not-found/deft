@@ -1,4 +1,4 @@
-const {ParserFactory, oneOf, optional, manyOf, separated, Node} = require('./parser-factory')
+const {ParserFactory, newline, oneOf, optional, manyOf, separated, Node} = require('./parser-factory')
 
 describe('parser factory', () => {
   describe('hotdog parser', () => {
@@ -21,6 +21,21 @@ describe('parser factory', () => {
         error: 'expected Root',
         lineNumber: 0,
         columnNumber: 0
+      })
+    })
+  })
+
+  xdescribe('hot\ndog parser', () => {
+    const parser = ParserFactory({
+      Root: ['hot', newline(), 'dog']
+    })
+
+    it('should parse exactly hot\ndog', () => {
+      expect(parser('hot\ndog')).toEqual({
+        case: 'Root',
+        value: ['hot', '\n', 'dog'],
+        lineNumber: 1,
+        columnNumber: 3
       })
     })
   })

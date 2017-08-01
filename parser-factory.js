@@ -1,5 +1,15 @@
 const R = require('ramda')
 
+const normalize = R.mapObjIndexed((form, node) => {
+  if (typeof form === 'string') {
+    return {
+      case: 'String',
+      value: form
+    }
+  }
+})
+
+
 function build(grammar, node) {
   if (node === 'Error') {
     throw new Error('grammar cannot use reserved node name "Error"')
@@ -8,35 +18,48 @@ function build(grammar, node) {
   if (!form) {
     throw new Error(`grammar does not contain the node named "${node}"`)
   }
-  if (typeof form === 'string') {
-    return (source) => {
-      if (source.startsWith(form)) {
-        const newLineCount = form.match(/(\r\n|\r|\n)/g)
-        return {
-          case: node,
-          value: source,
-          lineNumber: newLineCount
-            ? newLineCount.length
-            : 0,
-          columnNumber: form.length
-        }
-      } else {
-        return {
-          case: 'Error',
-          error: `expected ${node}`,
-          lineNumber: 0,
-          columnNumber: 0
+  
+  const operators = {
+    String({value}) {
+      return ([head, ...tail]) => {
+        if (head.startsWith(value)) {
+          return {
+            case: node,
+            value,
+            lineNumber: 0,
+            columnNumber: value.length
+          }
+        } else {
+          return {
+            case: 'Error',
+            error: `expected ${node}`,
+            lineNumber: 0,
+            columnNumber: 0
+          }
         }
       }
+    },
+
+    Newline() {
+
     }
   }
-  throw new Error('unsupported')
+
+  if (!operators[form.case]) {
+    throw new Error('unsupported')
+  }
+
+  return operators[form.case](form)
 }
 
 module.exports = {
   ParserFactory(grammar) {
     return (source) => {
-      const result = build(grammar, 'Root')(source)
+      const result = build(normalize(grammar), 'Root')(R.pipe(
+        R.chain(R.split('\r\n')),
+        R.chain(R.split('\r')),
+        R.chain(R.split('\n'))
+      )([source]))
       // const remainingSource = seek(source, result.lineNumber, columnNumber)
       // if (remainingSource) {
       //   return {
@@ -47,6 +70,11 @@ module.exports = {
       //   }
       // }
       return result
+    }
+  },
+  newline() {
+    return {
+      case: 'Newline'
     }
   }
 }
