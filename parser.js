@@ -85,5 +85,7 @@ module.exports = ParserFactory({
       Node('Expression'),
       ')'
     ]
-  )
+  ),
+
+  Root: optional(Node('Expression'))
 })
