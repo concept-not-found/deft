@@ -20,6 +20,13 @@ function build(grammar, node) {
             : 0,
           columnNumber: form.length
         }
+      } else {
+        return {
+          case: 'Error',
+          error: `expected ${node}`,
+          lineNumber: 0,
+          columnNumber: 0
+        }
       }
     }
   }
