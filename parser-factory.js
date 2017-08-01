@@ -124,11 +124,12 @@ function seek(lines, lineNumber, columnNumber) {
 module.exports = {
   ParserFactory(grammar) {
     return (source) => {
-      const lines = R.pipe(
+      const lexer = R.pipe(
         R.chain(R.split('\r\n')),
         R.chain(R.split('\r')),
         R.chain(R.split('\n'))
-      )([source])
+      )
+      const lines = lexer([source])
       const result = build(normalize(grammar), 'Root')(lines)
 
       if (result.case !== 'Error') {
