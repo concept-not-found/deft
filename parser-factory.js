@@ -52,23 +52,31 @@ function build(grammar, node) {
   return operators[form.case](form)
 }
 
+function seek(lines, lineNumber, columnNumber) {
+  return R.drop(columnNumber, lines[lineNumber])
+}
+
 module.exports = {
   ParserFactory(grammar) {
     return (source) => {
-      const result = build(normalize(grammar), 'Root')(R.pipe(
+      const lines = R.pipe(
         R.chain(R.split('\r\n')),
         R.chain(R.split('\r')),
         R.chain(R.split('\n'))
-      )([source]))
-      // const remainingSource = seek(source, result.lineNumber, columnNumber)
-      // if (remainingSource) {
-      //   return {
-      //     case: 'Error',
-      //     error: 'unexpected source after Root',
-      //     lineNumber: result.lineNumber,
-      //     columnNumber: result.columnNumber
-      //   }
-      // }
+      )([source])
+      const result = build(normalize(grammar), 'Root')(lines)
+
+      if (result.case !== 'Error') {
+        const remainingSource = seek(lines, result.lineNumber, result.columnNumber)
+        if (remainingSource) {
+          return {
+            case: 'Error',
+            error: 'unexpected source after Root',
+            lineNumber: result.lineNumber,
+            columnNumber: result.columnNumber
+          }
+        }
+      }
       return result
     }
   },

@@ -23,6 +23,15 @@ describe('parser factory', () => {
         columnNumber: 0
       })
     })
+
+    it('should fail to parse hotdog in your mouth', () => {
+      expect(parser('hotdog in your mouth')).toEqual({
+        case: 'Error',
+        error: 'unexpected source after Root',
+        lineNumber: 0,
+        columnNumber: 6
+      })
+    })
   })
 
   xdescribe('hot\ndog parser', () => {
