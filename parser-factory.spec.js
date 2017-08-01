@@ -34,7 +34,7 @@ describe('parser factory', () => {
     })
   })
 
-  xdescribe('hot\ndog parser', () => {
+  describe('hot\ndog parser', () => {
     const parser = ParserFactory({
       Root: ['hot', newline(), 'dog']
     })
