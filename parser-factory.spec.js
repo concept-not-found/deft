@@ -94,4 +94,21 @@ describe('parser factory', () => {
       })
     })
   })
+
+  describe('hotdog parser using array', () => {
+    const parser = ParserFactory({
+      Root: ['hot', 'dog']
+    })
+
+    it('should parse exactly hotdog', () => {
+      expect(parser('hotdog')).toEqual({
+        case: 'Root',
+        value: ['hot', 'dog'],
+        index: 6,
+        line: 0,
+        column: 6
+      })
+    })
+  })
+
 })
