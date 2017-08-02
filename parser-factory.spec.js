@@ -1,4 +1,4 @@
-const {ParserFactory, newline, oneOf, optional, manyOf, separated, Node} = require('./parser-factory')
+const {ParserFactory, oneOf} = require('./parser-factory')
 
 describe('parser factory', () => {
   describe('hotdog parser', () => {
@@ -107,6 +107,42 @@ describe('parser factory', () => {
         index: 6,
         line: 0,
         column: 6
+      })
+    })
+  })
+
+  describe('star trek|war parser', () => {
+    const parser = ParserFactory({
+      Root: ['star', ' ', oneOf('trek', 'wars')]
+    })
+
+    it('should parse star trek', () => {
+      expect(parser('star trek')).toEqual({
+        case: 'Root',
+        value: ['star', ' ', 'trek'],
+        index: 9,
+        line: 0,
+        column: 9
+      })
+    })
+
+    it('should parse star wars', () => {
+      expect(parser('star wars')).toEqual({
+        case: 'Root',
+        value: ['star', ' ', 'wars'],
+        index: 9,
+        line: 0,
+        column: 9
+      })
+    })
+
+    it('should fail to parse star stroll', () => {
+      expect(parser('star stroll')).toEqual({
+        case: 'Error',
+        error: 'expected oneOf("trek", "wars")',
+        index: 5,
+        line: 0,
+        column: 5
       })
     })
   })

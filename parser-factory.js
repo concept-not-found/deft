@@ -1,26 +1,47 @@
 const R = require('ramda')
 
 function normalizeForm(form, node) {
-  if (form.case) {
-    return form
-  }
-
   if (typeof form === 'string') {
     return {
       case: 'String',
-      value: form
+      value: form,
+      toString() {
+        return JSON.stringify(form)
+      }
     }
   }
 
   if (form instanceof Array) {
-    return {
+    const self = {
       case: 'Array',
-      elements: form.map((subform) => normalizeForm(subform, node))
+      elements: form.map((subform) => normalizeForm(subform, node)),
+      toString() {
+        return `[${self.elements.map((element) => element.toString()).join(', ')}]`
+      }
+    }
+    return self
+  }
+
+  const normalizers = {
+    OneOf({forms}) {
+      const self = {
+        case: 'OneOf',
+        forms: forms.map((subform) => normalizeForm(subform, node)),
+        toString() {
+          return `oneOf(${self.forms.map((form) => form.toString()).join(', ')})`
+        }
+      }
+      return self
     }
   }
 
-  throw new Error(`unsupported form ${JSON.stringify(form)} for node ${node}`)
+  const normalizer = normalizers[form.case]
+  if (!normalizer) {
+    throw new Error(`unsupported form ${JSON.stringify(form)} for node ${node}`)
+  }
+  return normalizer(form)
 }
+
 function normalize(grammar) {
   return R.mapObjIndexed(normalizeForm, grammar)
 }
@@ -95,28 +116,57 @@ function buildForm(grammar, node, form) {
 
     Array({elements}) {
       return (source, index, line, column) => {
-        return elements.reduce((previous, form) => {
-          if (previous.case === 'Error') {
-            return previous
+        const result = R.reduceWhile(
+          (previous) => previous.case !== 'Error',
+          (previous, form) => {
+            const nextSource = seek(source, previous.index)
+            const result = buildForm(grammar, node, form)(nextSource, index, line, column)
+            return Object.assign(
+              {},
+              result,
+              {
+                value: previous.value.concat(result.value),
+                index: previous.index + result.index,
+                line: previous.line + result.line,
+                column: previous.column + result.column
+              }
+            )
+          },
+          {
+            value: [],
+            index,
+            line,
+            column
+          },
+          elements
+        )
+        if (result.case === 'Error') {
+          return R.omit(['value'], result)
+        }
+        return result
+      }
+    },
+
+    OneOf({forms, toString}) {
+      return (source, index, line, column) => {
+        const match = R.reduceWhile(
+          (previous) => previous.case === 'Error',
+          (previous, form) => buildForm(grammar, node, form)(source, index, line, column),
+          {
+            case: 'Error'
+          },
+          forms
+        )
+        if (match.case === 'Error') {
+          return {
+            case: 'Error',
+            error: `expected ${toString()}`,
+            index,
+            line,
+            column
           }
-          const nextSource = seek(source, previous.index)
-          const result = buildForm(grammar, node, form)(nextSource, index, line, column)
-          return Object.assign(
-            {},
-            result,
-            {
-              value: previous.value.concat(result.value),
-              index: previous.index + result.index,
-              line: previous.line + result.line,
-              column: previous.column + result.column
-            }
-          )
-        }, {
-          value: [],
-          index,
-          line,
-          column
-        })
+        }
+        return match
       }
     }
   }
@@ -150,6 +200,13 @@ module.exports = {
         }
       }
       return result
+    }
+  },
+
+  oneOf(...forms) {
+    return {
+      case: 'OneOf',
+      forms
     }
   }
 }
