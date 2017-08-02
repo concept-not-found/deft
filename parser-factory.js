@@ -102,12 +102,12 @@ function countLines(source) {
 
 function buildForm(grammar, node, form) {
   const operators = {
-    String({value}) {
+    String({value, toString}) {
       return (source, index, line, column) => {
         if (!source.startsWith(value)) {
           return {
             case: 'Error',
-            error: `expected ${node}`,
+            error: `expected ${toString()}`,
             index,
             line,
             column

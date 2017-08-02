@@ -19,7 +19,7 @@ describe('parser factory', () => {
     it('should fail to parse empty', () => {
       expect(parser('')).toEqual({
         case: 'Error',
-        error: 'expected Root',
+        error: 'expected "hotdog"',
         index: 0,
         line: 0,
         column: 0
@@ -29,7 +29,7 @@ describe('parser factory', () => {
     it('should fail to parse not hotdog', () => {
       expect(parser('not hotdog')).toEqual({
         case: 'Error',
-        error: 'expected Root',
+        error: 'expected "hotdog"',
         index: 0,
         line: 0,
         column: 0
@@ -65,7 +65,7 @@ describe('parser factory', () => {
     it('should fail to parse hot\\r\\ndog', () => {
       expect(parser('hot\r\ndog')).toEqual({
         case: 'Error',
-        error: 'expected Root',
+        error: 'expected "hot\\ndog"',
         index: 0,
         line: 0,
         column: 0
