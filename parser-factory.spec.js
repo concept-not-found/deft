@@ -119,6 +119,16 @@ describe('parser factory', () => {
         column: 6
       })
     })
+
+    it('should fail to parse empty', () => {
+      expect(parser('')).toEqual({
+        case: 'Error',
+        error: 'expected ["hot", "dog"]',
+        index: 0,
+        line: 0,
+        column: 0
+      })
+    })
   })
 
   describe('star trek|war parser', () => {
