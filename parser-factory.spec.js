@@ -51,5 +51,15 @@ describe('parser factory', () => {
         column: 3
       })
     })
+
+    it('should fail to parse hot\r\ndog', () => {
+      expect(parser('hot\r\ndog')).toEqual({
+        case: 'Error',
+        error: 'expected Root',
+        index: 0,
+        line: 0,
+        column: 0
+      })
+    })
   })
 })
