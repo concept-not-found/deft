@@ -123,7 +123,7 @@ describe('parser factory', () => {
     it('should fail to parse empty', () => {
       expect(parser('')).toEqual({
         case: 'Error',
-        error: 'expected ["hot", "dog"]',
+        error: 'expected "hot"',
         index: 0,
         line: 0,
         column: 0
