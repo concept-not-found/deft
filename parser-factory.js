@@ -38,72 +38,85 @@ function build(grammar, node) {
   return buildForm(grammar, node, form)
 }
 
+function countLines(source) {
+  let count = 0
+  let consumed = 0
+  while (consumed < source.length) {
+    let working = consumed
+    while (working < source.length) {
+      const character = source[working]
+      if (character === '\n' || character === '\r') {
+        break
+      }
+      working += 1
+    }
+    if (working >= source.length) {
+      break
+    }
+    consumed = working
+    if (source[consumed] === '\r' && source[consumed + 1] === '\n') {
+      count += 1
+      consumed += 2
+      continue
+    }
+    count += 1
+    consumed += 1
+  }
+  return {
+    newlineCount: count,
+    lastLineLength: source.length - consumed
+  }
+}
+
 function buildForm(grammar, node, form) {
   const operators = {
     String({value}) {
-      return ([head, ...tail]) => {
-        if (!head.startsWith(value)) {
+      return (source, index, line, column) => {
+        if (!source.startsWith(value)) {
           return {
             case: 'Error',
             error: `expected ${node}`,
-            lineNumber: 0,
-            columnNumber: 0
+            index,
+            line,
+            column
           }
         }
 
+        const {newlineCount, lastLineLength} = countLines(value)
         return {
           case: node,
           value,
-          lineNumber: 0,
-          columnNumber: value.length
+          index: index + value.length,
+          line: line + newlineCount,
+          column: column + lastLineLength
         }
       }
     },
 
     Array({elements}) {
-      return (lines) => {
+      return (source, index, line, column) => {
         return elements.reduce((previous, form) => {
           if (previous.case === 'Error') {
             return previous
           }
-          const nextLines = seek(lines, previous.lineNumber, previous.columnNumber)
-          const result = buildForm(grammar, node, form)(nextLines)
+          const nextSource = seek(source, previous.index)
+          const result = buildForm(grammar, node, form)(nextSource, index, line, column)
           return Object.assign(
             {},
             result,
             {
               value: previous.value.concat(result.value),
-              lineNumber: previous.lineNumber + result.lineNumber,
-              columnNumber: result.lineNumber
-                ? 0
-                : previous.columnNumber + result.columnNumber
+              index: previous.index + result.index,
+              line: previous.line + result.line,
+              column: previous.column + result.column
             }
           )
         }, {
           value: [],
-          lineNumber: 0,
-          columnNumber: 0
+          index,
+          line,
+          column
         })
-      }
-    },
-
-    Newline() {
-      return ([head, ...tail]) => {
-        if (head) {
-          return {
-            case: 'Error',
-            error: 'expected newline',
-            lineNumber: 0,
-            columnNumber: 0
-          }
-        }
-
-        return {
-          case: 'Newline',
-          value: '\n',
-          lineNumber: 1,
-          columnNumber: 0
-        }
       }
     }
   }
@@ -115,40 +128,28 @@ function buildForm(grammar, node, form) {
   return operators[form.case](form)
 }
 
-function seek(lines, lineNumber, columnNumber) {
-  const remainingLines = R.drop(lineNumber, lines)
-  const remainingLine = R.drop(columnNumber, remainingLines[0])
-  return [remainingLine, ...R.tail(remainingLines)]
+function seek(source, index) {
+  return R.drop(index, source)
 }
 
 module.exports = {
   ParserFactory(grammar) {
     return (source) => {
-      const lexer = R.pipe(
-        R.chain(R.split('\r\n')),
-        R.chain(R.split('\r')),
-        R.chain(R.split('\n'))
-      )
-      const lines = lexer([source])
-      const result = build(normalize(grammar), 'Root')(lines)
+      const result = build(normalize(grammar), 'Root')(source, 0, 0, 0)
 
       if (result.case !== 'Error') {
-        const remainingSource = seek(lines, result.lineNumber, result.columnNumber)
-        if (remainingSource[0]) {
+        const remainingSource = seek(source, result.index)
+        if (remainingSource) {
           return {
             case: 'Error',
             error: 'unexpected source after Root',
-            lineNumber: result.lineNumber,
-            columnNumber: result.columnNumber
+            index: result.index,
+            line: result.line,
+            column: result.column
           }
         }
       }
       return result
-    }
-  },
-  newline() {
-    return {
-      case: 'Newline'
     }
   }
 }

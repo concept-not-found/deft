@@ -10,8 +10,9 @@ describe('parser factory', () => {
       expect(parser('hotdog')).toEqual({
         case: 'Root',
         value: 'hotdog',
-        lineNumber: 0,
-        columnNumber: 6
+        index: 6,
+        line: 0,
+        column: 6
       })
     })
 
@@ -19,8 +20,9 @@ describe('parser factory', () => {
       expect(parser('not hotdog')).toEqual({
         case: 'Error',
         error: 'expected Root',
-        lineNumber: 0,
-        columnNumber: 0
+        index: 0,
+        line: 0,
+        column: 0
       })
     })
 
@@ -28,23 +30,25 @@ describe('parser factory', () => {
       expect(parser('hotdog in your mouth')).toEqual({
         case: 'Error',
         error: 'unexpected source after Root',
-        lineNumber: 0,
-        columnNumber: 6
+        index: 6,
+        line: 0,
+        column: 6
       })
     })
   })
 
   describe('hot\ndog parser', () => {
     const parser = ParserFactory({
-      Root: ['hot', newline(), 'dog']
+      Root: 'hot\ndog'
     })
 
     it('should parse exactly hot\ndog', () => {
       expect(parser('hot\ndog')).toEqual({
         case: 'Root',
-        value: ['hot', '\n', 'dog'],
-        lineNumber: 1,
-        columnNumber: 3
+        value: 'hot\ndog',
+        index: 7,
+        line: 1,
+        column: 3
       })
     })
   })
