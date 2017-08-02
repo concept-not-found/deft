@@ -32,6 +32,17 @@ function normalizeForm(form, node) {
         }
       }
       return self
+    },
+
+    ManyOf({form}) {
+      const self = {
+        case: 'ManyOf',
+        form: normalizeForm(form, node),
+        toString() {
+          return `manyOf(${self.form.toString()})`
+        }
+      }
+      return self
     }
   }
 
@@ -168,6 +179,43 @@ function buildForm(grammar, node, form) {
         }
         return match
       }
+    },
+
+    ManyOf({form, toString}) {
+      return (source, index, line, column) => {
+        let previous
+        let next = {
+          value: [],
+          index,
+          line,
+          column
+        }
+        do {
+          previous = next
+          const nextSource = seek(source, previous.index)
+          const result = buildForm(grammar, node, form)(nextSource, index, line, column)
+          next = Object.assign(
+            {},
+            result,
+            {
+              value: previous.value.concat(result.value),
+              index: previous.index + result.index,
+              line: previous.line + result.line,
+              column: previous.column + result.column
+            }
+          )
+        } while (next.case !== 'Error')
+        if (!previous.case) {
+          return {
+            case: 'Error',
+            error: `expected ${toString()}`,
+            index,
+            line,
+            column
+          }
+        }
+        return previous
+      }
     }
   }
 
@@ -207,6 +255,13 @@ module.exports = {
     return {
       case: 'OneOf',
       forms
+    }
+  },
+
+  manyOf(form) {
+    return {
+      case: 'ManyOf',
+      form
     }
   }
 }

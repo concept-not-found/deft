@@ -1,4 +1,4 @@
-const {ParserFactory, oneOf} = require('./parser-factory')
+const {ParserFactory, oneOf, manyOf} = require('./parser-factory')
 
 describe('parser factory', () => {
   describe('hotdog parser', () => {
@@ -13,6 +13,16 @@ describe('parser factory', () => {
         index: 6,
         line: 0,
         column: 6
+      })
+    })
+
+    it('should fail to parse empty', () => {
+      expect(parser('')).toEqual({
+        case: 'Error',
+        error: 'expected Root',
+        index: 0,
+        line: 0,
+        column: 0
       })
     })
 
@@ -143,6 +153,42 @@ describe('parser factory', () => {
         index: 5,
         line: 0,
         column: 5
+      })
+    })
+  })
+
+  describe('ㅋㅋㅋㅋㅋㅋ parser', () => {
+    const parser = ParserFactory({
+      Root: manyOf('ㅋ')
+    })
+
+    it('should parse ㅋ', () => {
+      expect(parser('ㅋ')).toEqual({
+        case: 'Root',
+        value: ['ㅋ'],
+        index: 1,
+        line: 0,
+        column: 1
+      })
+    })
+
+    it('should parse ㅋㅋㅋㅋㅋㅋ', () => {
+      expect(parser('ㅋㅋㅋㅋㅋㅋ')).toEqual({
+        case: 'Root',
+        value: ['ㅋ', 'ㅋ', 'ㅋ', 'ㅋ', 'ㅋ', 'ㅋ'],
+        index: 6,
+        line: 0,
+        column: 6
+      })
+    })
+
+    it('should fail to parse empty', () => {
+      expect(parser('')).toEqual({
+        case: 'Error',
+        error: 'expected manyOf("ㅋ")',
+        index: 0,
+        line: 0,
+        column: 0
       })
     })
   })
