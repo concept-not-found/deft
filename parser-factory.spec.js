@@ -37,12 +37,12 @@ describe('parser factory', () => {
     })
   })
 
-  describe('hot\ndog parser', () => {
+  describe('hot\\ndog parser', () => {
     const parser = ParserFactory({
       Root: 'hot\ndog'
     })
 
-    it('should parse exactly hot\ndog', () => {
+    it('should parse exactly hot\\ndog', () => {
       expect(parser('hot\ndog')).toEqual({
         case: 'Root',
         value: 'hot\ndog',
@@ -52,13 +52,45 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse hot\r\ndog', () => {
+    it('should fail to parse hot\\r\\ndog', () => {
       expect(parser('hot\r\ndog')).toEqual({
         case: 'Error',
         error: 'expected Root',
         index: 0,
         line: 0,
         column: 0
+      })
+    })
+  })
+
+  describe('hotdog\\n parser', () => {
+    const parser = ParserFactory({
+      Root: 'hotdog\n'
+    })
+
+    it('should parse exactly hotdog\\n', () => {
+      expect(parser('hotdog\n')).toEqual({
+        case: 'Root',
+        value: 'hotdog\n',
+        index: 7,
+        line: 1,
+        column: 0
+      })
+    })
+  })
+
+  describe('\\nhotdog parser', () => {
+    const parser = ParserFactory({
+      Root: '\nhotdog'
+    })
+
+    it('should parse exactly \\nhotdog', () => {
+      expect(parser('\nhotdog')).toEqual({
+        case: 'Root',
+        value: '\nhotdog',
+        index: 7,
+        line: 1,
+        column: 6
       })
     })
   })
