@@ -43,6 +43,17 @@ function normalizeForm(form, node) {
         }
       }
       return self
+    },
+
+    Optional({form}) {
+      const self = {
+        case: 'Optional',
+        form: normalizeForm(form, node),
+        toString() {
+          return `optional(${self.form.toString()})`
+        }
+      }
+      return self
     }
   }
 
@@ -216,6 +227,22 @@ function buildForm(grammar, node, form) {
         }
         return previous
       }
+    },
+
+    Optional({form}) {
+      return (source, index, line, column) => {
+        const result = buildForm(grammar, node, form)(source, index, line, column)
+        if (result.case === 'Error') {
+          return {
+            case: node,
+            value: '',
+            index,
+            line,
+            column
+          }
+        }
+        return result
+      }
     }
   }
 
@@ -261,6 +288,13 @@ module.exports = {
   manyOf(form) {
     return {
       case: 'ManyOf',
+      form
+    }
+  },
+
+  optional(form) {
+    return {
+      case: 'Optional',
       form
     }
   }

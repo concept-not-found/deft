@@ -1,4 +1,4 @@
-const {ParserFactory, oneOf, manyOf} = require('./parser-factory')
+const {ParserFactory, oneOf, manyOf, optional} = require('./parser-factory')
 
 describe('parser factory', () => {
   describe('hotdog parser', () => {
@@ -196,6 +196,32 @@ describe('parser factory', () => {
       expect(parser('')).toEqual({
         case: 'Error',
         error: 'expected manyOf("ㅋ")',
+        index: 0,
+        line: 0,
+        column: 0
+      })
+    })
+  })
+
+  describe('maeby parser', () => {
+    const parser = ParserFactory({
+      Root: optional('maeby')
+    })
+
+    it('should parse maeby', () => {
+      expect(parser('maeby')).toEqual({
+        case: 'Root',
+        value: 'maeby',
+        index: 5,
+        line: 0,
+        column: 5
+      })
+    })
+
+    it('should parse empty', () => {
+      expect(parser('')).toEqual({
+        case: 'Root',
+        value: '',
         index: 0,
         line: 0,
         column: 0
