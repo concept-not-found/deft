@@ -115,14 +115,13 @@ function countLines(source) {
 function buildForm(grammar, node, form) {
   const operators = {
     String({value, toString}) {
-      return (source, index, line, column) => {
+      return (source, start, end) => {
         if (!source.startsWith(value)) {
           return {
             case: 'Error',
             error: `expected ${toString()}`,
-            index,
-            line,
-            column
+            start,
+            end
           }
         }
 
@@ -130,36 +129,41 @@ function buildForm(grammar, node, form) {
         return {
           case: node,
           value,
-          index: index + value.length,
-          line: line + newlineCount,
-          column: column + lastLineLength
+          start: R.clone(end),
+          end: {
+            index: end.index + value.length,
+            line: end.line + newlineCount,
+            column: end.column + lastLineLength
+          }
         }
       }
     },
 
     Array({forms}) {
-      return (source, index, line, column) => {
+      return (source, start, end) => {
         const result = R.reduceWhile(
           (previous) => previous.case !== 'Error',
           (previous, form) => {
-            const nextSource = seek(source, previous.index)
-            const result = buildForm(grammar, node, form)(nextSource, index, line, column)
+            const nextSource = seek(source, previous.end.index)
+            const result = buildForm(grammar, node, form)(nextSource, start, end)
             return Object.assign(
               {},
               result,
               {
                 value: previous.value.concat(result.value),
-                index: previous.index + result.index,
-                line: previous.line + result.line,
-                column: previous.column + result.column
+                start: R.clone(end),
+                end: {
+                  index: previous.end.index + result.end.index,
+                  line: previous.end.line + result.end.line,
+                  column: previous.end.column + result.end.column
+                }
               }
             )
           },
           {
             value: [],
-            index,
-            line,
-            column
+            start,
+            end
           },
           forms
         )
@@ -171,10 +175,10 @@ function buildForm(grammar, node, form) {
     },
 
     OneOf({forms, toString}) {
-      return (source, index, line, column) => {
+      return (source, start, end) => {
         const match = R.reduceWhile(
           (previous) => previous.case === 'Error',
-          (previous, form) => buildForm(grammar, node, form)(source, index, line, column),
+          (previous, form) => buildForm(grammar, node, form)(source, start, end),
           {
             case: 'Error'
           },
@@ -184,9 +188,8 @@ function buildForm(grammar, node, form) {
           return {
             case: 'Error',
             error: `expected ${toString()}`,
-            index,
-            line,
-            column
+            start,
+            end
           }
         }
         return match
@@ -194,26 +197,28 @@ function buildForm(grammar, node, form) {
     },
 
     ManyOf({form, toString}) {
-      return (source, index, line, column) => {
+      return (source, start, end) => {
         let previous
         let next = {
           value: [],
-          index,
-          line,
-          column
+          start,
+          end
         }
         do {
           previous = next
-          const nextSource = seek(source, previous.index)
-          const result = buildForm(grammar, node, form)(nextSource, index, line, column)
+          const nextSource = seek(source, previous.end.index)
+          const result = buildForm(grammar, node, form)(nextSource, start, end)
           next = Object.assign(
             {},
             result,
             {
               value: previous.value.concat(result.value),
-              index: previous.index + result.index,
-              line: previous.line + result.line,
-              column: previous.column + result.column
+              start: R.clone(end),
+              end: {
+                index: previous.end.index + result.end.index,
+                line: previous.end.line + result.end.line,
+                column: previous.end.column + result.end.column
+              }
             }
           )
         } while (next.case !== 'Error')
@@ -221,9 +226,8 @@ function buildForm(grammar, node, form) {
           return {
             case: 'Error',
             error: `expected ${toString()}`,
-            index,
-            line,
-            column
+            start,
+            end
           }
         }
         return previous
@@ -231,15 +235,14 @@ function buildForm(grammar, node, form) {
     },
 
     Optional({form}) {
-      return (source, index, line, column) => {
-        const result = buildForm(grammar, node, form)(source, index, line, column)
+      return (source, start, end) => {
+        const result = buildForm(grammar, node, form)(source, start, end)
         if (result.case === 'Error') {
           return {
             case: node,
             value: '',
-            index,
-            line,
-            column
+            start,
+            end
           }
         }
         return result
@@ -261,17 +264,26 @@ function seek(source, index) {
 module.exports = {
   ParserFactory(grammar) {
     return (source) => {
-      const result = build(normalize(grammar), 'Root')(source, 0, 0, 0)
+      const start = {
+        index: 0,
+        line: 0,
+        column: 0
+      }
+      const end = {
+        index: 0,
+        line: 0,
+        column: 0
+      }
+      const result = build(normalize(grammar), 'Root')(source, start, end)
 
       if (result.case !== 'Error') {
-        const remainingSource = seek(source, result.index)
+        const remainingSource = seek(source, result.end.index)
         if (remainingSource) {
           return {
             case: 'Error',
             error: 'unexpected source after Root',
-            index: result.index,
-            line: result.line,
-            column: result.column
+            start: result.start,
+            end: result.end
           }
         }
       }
