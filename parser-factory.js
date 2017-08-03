@@ -251,7 +251,7 @@ function build(grammar, form) {
         const result = build(grammar, form)(source, pointer)
         if (result.case === 'Error') {
           return {
-            case: 'Nothing',
+            case: 'String',
             value: '',
             start: pointer,
             end: pointer,
