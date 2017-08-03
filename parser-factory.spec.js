@@ -27,6 +27,7 @@ describe('parser factory', () => {
     it('should fail to parse empty', () => {
       expect(parser('')).toEqual({
         case: 'Error',
+        ref: 'Root',
         error: 'expected "hotdog"',
         index: 0,
         line: 0,
@@ -37,6 +38,7 @@ describe('parser factory', () => {
     it('should fail to parse not hotdog', () => {
       expect(parser('not hotdog')).toEqual({
         case: 'Error',
+        ref: 'Root',
         error: 'expected "hotdog"',
         index: 0,
         line: 0,
@@ -47,6 +49,7 @@ describe('parser factory', () => {
     it('should fail to parse hotdog in your mouth', () => {
       expect(parser('hotdog in your mouth')).toEqual({
         case: 'Error',
+        ref: 'Root',
         error: 'unexpected source after Root',
         index: 6,
         line: 0,
@@ -81,6 +84,7 @@ describe('parser factory', () => {
     it('should fail to parse hot\\r\\ndog', () => {
       expect(parser('hot\r\ndog')).toEqual({
         case: 'Error',
+        ref: 'Root',
         error: 'expected "hot\\ndog"',
         index: 0,
         line: 0,
@@ -163,6 +167,7 @@ describe('parser factory', () => {
     it('should fail to parse empty', () => {
       expect(parser('')).toEqual({
         case: 'Error',
+        ref: 'Root',
         error: 'expected "hot"',
         index: 0,
         line: 0,
@@ -215,6 +220,7 @@ describe('parser factory', () => {
     it('should fail to parse star stroll', () => {
       expect(parser('star stroll')).toEqual({
         case: 'Error',
+        ref: 'Root',
         error: 'expected oneOf("trek", "wars")',
         index: 5,
         line: 0,
@@ -267,6 +273,7 @@ describe('parser factory', () => {
     it('should fail to parse empty', () => {
       expect(parser('')).toEqual({
         case: 'Error',
+        ref: 'Root',
         error: 'expected manyOf("ㅋ")',
         index: 0,
         line: 0,
@@ -361,6 +368,7 @@ describe('parser factory', () => {
     it('should fail to parse hotcat', () => {
       expect(parser('hotcat')).toEqual({
         case: 'Error',
+        ref: 'Animal',
         error: 'expected "dog"',
         index: 3,
         line: 0,

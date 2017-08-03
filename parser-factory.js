@@ -60,7 +60,10 @@ function normalizeForm(form) {
     Ref({name}) {
       return {
         case: 'Ref',
-        name
+        name,
+        toString() {
+          return `ref("${name}")`
+        }
       }
     }
   }
@@ -268,6 +271,9 @@ function build(grammar, form) {
       return (source, pointer) => {
         const result = build(grammar, grammar[name])(source, pointer)
         if (result.case === 'Error') {
+          if (!result.ref) {
+            result.ref = name
+          }
           return result
         }
         const self = {
@@ -314,6 +320,7 @@ const self = {
       if (remainingSource) {
         return {
           case: 'Error',
+          ref: 'Root',
           error: 'unexpected source after Root',
           index: result.end.index,
           line: result.end.line,
