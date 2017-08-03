@@ -222,7 +222,7 @@ module.exports = {
       return value
     }
   },
-  
+
   oneOf,
   manyOf,
   optional,

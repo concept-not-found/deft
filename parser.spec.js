@@ -1,5 +1,5 @@
 describe('parser', () => {
   it('should', () => {
-    
+
   })
 })
