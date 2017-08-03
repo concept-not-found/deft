@@ -275,7 +275,7 @@ function build(grammar, form) {
           start: result.start,
           end: result.end,
           asValue() {
-            return R.omit(['asValue'], self)
+            return R.omit(['case', 'asValue'], self)
           }
         }
         return self
@@ -318,7 +318,9 @@ const self = {
         }
       }
 
-      return result.asValue()
+      const value = result.asValue()
+      value.case = 'Success'
+      return value
     }
   },
 

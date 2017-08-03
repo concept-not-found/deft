@@ -351,7 +351,6 @@ describe('parser factory', () => {
         value: [
           'hot',
           {
-            case: 'Success',
             ref: 'Animal',
             value: 'dog',
             start: {
