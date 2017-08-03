@@ -34,7 +34,7 @@ function parse(grammar, form, source, pointer) {
       const result = R.reduceWhile(
         (previous) => previous.case !== 'Error',
         (previous, form) => {
-          const nextSource = seek(source, previous.end.index)
+          const nextSource = R.drop(previous.end.index, source)
           const result = parse(grammar, form, nextSource, previous.end)
           if (result.case === 'Error') {
             return result
@@ -92,7 +92,7 @@ function parse(grammar, form, source, pointer) {
       }
       do {
         previous = next
-        const nextSource = seek(source, previous.end.index)
+        const nextSource = R.drop(previous.end.index, source)
         const result = parse(grammar, form, nextSource, previous.end)
         if (result.case === 'Error') {
           break
@@ -160,10 +160,6 @@ function parse(grammar, form, source, pointer) {
   })(form)
 }
 
-function seek(source, index) {
-  return R.drop(index, source)
-}
-
 module.exports = {
   ParserFactory(grammar) {
     return (source) => {
@@ -178,7 +174,7 @@ module.exports = {
         return result
       }
 
-      const remainingSource = seek(source, result.end.index)
+      const remainingSource = R.drop(result.end.index, source)
       if (remainingSource) {
         return {
           case: 'Error',
