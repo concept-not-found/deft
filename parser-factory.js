@@ -109,14 +109,14 @@ function countLines(source) {
 function build(grammar, form) {
   const operators = {
     String({value, toString}) {
-      return (source, end) => {
+      return (source, pointer) => {
         if (!source.startsWith(value)) {
           return {
             case: 'Error',
             error: `expected ${toString()}`,
-            index: end.index,
-            line: end.line,
-            column: end.column,
+            index: pointer.index,
+            line: pointer.line,
+            column: pointer.column,
           }
         }
 
@@ -124,11 +124,11 @@ function build(grammar, form) {
         return {
           case: 'String',
           value,
-          start: end,
+          start: pointer,
           end: {
-            index: end.index + value.length,
-            line: end.line + newlineCount,
-            column: end.column + lastLineLength
+            index: pointer.index + value.length,
+            line: pointer.line + newlineCount,
+            column: pointer.column + lastLineLength
           },
           asValue() {
             return value
@@ -138,7 +138,7 @@ function build(grammar, form) {
     },
 
     Array({forms}) {
-      return (source, end) => {
+      return (source, pointer) => {
         const result = R.reduceWhile(
           (previous) => previous.case !== 'Error',
           (previous, form) => {
@@ -157,13 +157,13 @@ function build(grammar, form) {
             }
             return {
               value: previous.value.concat(result),
-              start: end,
+              start: pointer,
               end: result.end
             }
           },
           {
             value: [],
-            end
+            end: pointer
           },
           forms
         )
@@ -183,10 +183,10 @@ function build(grammar, form) {
     },
 
     OneOf({forms, toString}) {
-      return (source, end) => {
+      return (source, pointer) => {
         const match = R.reduceWhile(
           (previous) => previous.case === 'Error',
-          (previous, form) => build(grammar, form)(source, end),
+          (previous, form) => build(grammar, form)(source, pointer),
           {
             case: 'Error'
           },
@@ -196,9 +196,9 @@ function build(grammar, form) {
           return {
             case: 'Error',
             error: `expected ${toString()}`,
-            index: end.index,
-            line: end.line,
-            column: end.column
+            index: pointer.index,
+            line: pointer.line,
+            column: pointer.column
           }
         }
         return match
@@ -206,11 +206,11 @@ function build(grammar, form) {
     },
 
     ManyOf({form, toString}) {
-      return (source, end) => {
+      return (source, pointer) => {
         let previous
         let next = {
           value: [],
-          end
+          end: pointer
         }
         do {
           previous = next
@@ -221,7 +221,7 @@ function build(grammar, form) {
           }
           next = {
             value: previous.value.concat(result),
-            start: end,
+            start: pointer,
             end: result.end
           }
         } while (true)
@@ -229,9 +229,9 @@ function build(grammar, form) {
           return {
             case: 'Error',
             error: `expected ${toString()}`,
-            index: end.index,
-            line: end.line,
-            column: end.column
+            index: pointer.index,
+            line: pointer.line,
+            column: pointer.column
           }
         }
         return {
@@ -247,14 +247,14 @@ function build(grammar, form) {
     },
 
     Optional({form}) {
-      return (source, end) => {
-        const result = build(grammar, form)(source, end)
+      return (source, pointer) => {
+        const result = build(grammar, form)(source, pointer)
         if (result.case === 'Error') {
           return {
             case: 'Nothing',
             value: '',
-            start: end,
-            end,
+            start: pointer,
+            end: pointer,
             asValue() {
               return ''
             }
@@ -265,8 +265,8 @@ function build(grammar, form) {
     },
 
     Ref({node}) {
-      return (source, end) => {
-        const result = build(grammar, grammar[node])(source, end)
+      return (source, pointer) => {
+        const result = build(grammar, grammar[node])(source, pointer)
         if (result.case === 'Error') {
           return result
         }
@@ -299,12 +299,12 @@ function seek(source, index) {
 const self = {
   ParserFactory(grammar) {
     return (source) => {
-      const end = {
+      const pointer = {
         index: 0,
         line: 0,
         column: 0
       }
-      const result = build(normalize(grammar), self.ref('Root'))(source, end)
+      const result = build(normalize(grammar), self.ref('Root'))(source, pointer)
 
       if (result.case === 'Error') {
         return result
