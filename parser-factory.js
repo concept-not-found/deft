@@ -146,13 +146,7 @@ function build(grammar, form) {
             const nextSource = seek(source, previous.end.index)
             const result = build(grammar, form)(nextSource, previous.end)
             if (result.case === 'Error') {
-              return Object.assign(
-                {},
-                result,
-                {
-                  pointer: previous.end
-                }
-              )
+              return result
             }
             return {
               value: previous.value.concat(result),
