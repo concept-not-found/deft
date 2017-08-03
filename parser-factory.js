@@ -271,13 +271,13 @@ function build(grammar, form) {
           return result
         }
         const self = {
-          case: 'Success',
-          ref: name,
+          case: 'Ref',
+          name,
           value: result.asValue(),
           start: result.start,
           end: result.end,
           asValue() {
-            return R.omit(['case', 'asValue'], self)
+            return R.omit(['asValue'], self)
           }
         }
         return self
