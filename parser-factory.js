@@ -57,10 +57,10 @@ function normalizeForm(form) {
       return self
     },
 
-    Ref({node}) {
+    Ref({name}) {
       return {
         case: 'Ref',
-        node
+        name
       }
     }
   }
@@ -264,15 +264,15 @@ function build(grammar, form) {
       }
     },
 
-    Ref({node}) {
+    Ref({name}) {
       return (source, pointer) => {
-        const result = build(grammar, grammar[node])(source, pointer)
+        const result = build(grammar, grammar[name])(source, pointer)
         if (result.case === 'Error') {
           return result
         }
         const self = {
           case: 'Ref',
-          node,
+          name,
           value: result.asValue(),
           start: result.start,
           end: result.end,
@@ -346,10 +346,10 @@ const self = {
     }
   },
 
-  ref(node) {
+  ref(name) {
     return {
       case: 'Ref',
-      node
+      name
     }
   }
 }
