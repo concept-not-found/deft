@@ -1,7 +1,7 @@
 const R = require('ramda')
 const match = require('./match')
 
-function normalizeForm(form) {
+function normalize(form) {
   if (typeof form === 'string') {
     return {
       case: 'String',
@@ -16,7 +16,7 @@ function normalizeForm(form) {
     const forms = form
     const self = {
       case: 'Array',
-      forms: forms.map(normalizeForm),
+      forms: forms.map(normalize),
       toString() {
         return `[${self.forms.map((form) => form.toString()).join(', ')}]`
       }
@@ -28,7 +28,7 @@ function normalizeForm(form) {
     OneOf({forms}) {
       const self = {
         case: 'OneOf',
-        forms: forms.map(normalizeForm),
+        forms: forms.map(normalize),
         toString() {
           return `oneOf(${self.forms.map((form) => form.toString()).join(', ')})`
         }
@@ -39,7 +39,7 @@ function normalizeForm(form) {
     ManyOf({form}) {
       const self = {
         case: 'ManyOf',
-        form: normalizeForm(form),
+        form: normalize(form),
         toString() {
           return `manyOf(${self.form.toString()})`
         }
@@ -50,7 +50,7 @@ function normalizeForm(form) {
     Optional({form}) {
       const self = {
         case: 'Optional',
-        form: normalizeForm(form),
+        form: normalize(form),
         toString() {
           return `optional(${self.form.toString()})`
         }
@@ -70,4 +70,37 @@ function normalizeForm(form) {
   })(form)
 }
 
-module.exports = (grammar) => R.mapObjIndexed(normalizeForm, grammar)
+
+module.exports = {
+  GrammarFactory(grammar) {
+    return R.mapObjIndexed(normalize, grammar)
+  },
+
+  oneOf(...forms) {
+    return {
+      case: 'OneOf',
+      forms
+    }
+  },
+
+  manyOf(form) {
+    return {
+      case: 'ManyOf',
+      form
+    }
+  },
+
+  optional(form) {
+    return {
+      case: 'Optional',
+      form
+    }
+  },
+
+  ref(name) {
+    return {
+      case: 'Ref',
+      name
+    }
+  }
+}

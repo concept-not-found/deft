@@ -1,6 +1,6 @@
 const R = require('ramda')
 const match = require('./match')
-const normalize = require('./grammar-normalizer')
+const {GrammarFactory, oneOf, manyOf, optional, ref} = require('./grammar-factory')
 
 function countLines(source) {
   let count = 0
@@ -193,7 +193,7 @@ function seek(source, index) {
   return R.drop(index, source)
 }
 
-const self = {
+module.exports = {
   ParserFactory(grammar) {
     return (source) => {
       const pointer = {
@@ -201,7 +201,7 @@ const self = {
         line: 0,
         column: 0
       }
-      const result = parse(normalize(grammar), self.ref('Root'), source, pointer)
+      const result = parse(GrammarFactory(grammar), ref('Root'), source, pointer)
 
       if (result.case === 'Error') {
         return result
@@ -222,34 +222,9 @@ const self = {
       return value
     }
   },
-
-  oneOf(...forms) {
-    return {
-      case: 'OneOf',
-      forms
-    }
-  },
-
-  manyOf(form) {
-    return {
-      case: 'ManyOf',
-      form
-    }
-  },
-
-  optional(form) {
-    return {
-      case: 'Optional',
-      form
-    }
-  },
-
-  ref(name) {
-    return {
-      case: 'Ref',
-      name
-    }
-  }
+  
+  oneOf,
+  manyOf,
+  optional,
+  ref
 }
-
-module.exports = self
