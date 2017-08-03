@@ -28,16 +28,9 @@ describe('parser factory', () => {
       expect(parser('')).toEqual({
         case: 'Error',
         error: 'expected "hotdog"',
-        start: {
-          index: 0,
-          line: 0,
-          column: 0
-        },
-        end: {
-          index: 0,
-          line: 0,
-          column: 0
-        }
+        index: 0,
+        line: 0,
+        column: 0
       })
     })
 
@@ -45,16 +38,9 @@ describe('parser factory', () => {
       expect(parser('not hotdog')).toEqual({
         case: 'Error',
         error: 'expected "hotdog"',
-        start: {
-          index: 0,
-          line: 0,
-          column: 0
-        },
-        end: {
-          index: 0,
-          line: 0,
-          column: 0
-        }
+        index: 0,
+        line: 0,
+        column: 0
       })
     })
 
@@ -62,16 +48,9 @@ describe('parser factory', () => {
       expect(parser('hotdog in your mouth')).toEqual({
         case: 'Error',
         error: 'unexpected source after Root',
-        start: {
-          index: 0,
-          line: 0,
-          column: 0
-        },
-        end: {
-          index: 6,
-          line: 0,
-          column: 6
-        }
+        index: 6,
+        line: 0,
+        column: 6
       })
     })
   })
@@ -103,16 +82,9 @@ describe('parser factory', () => {
       expect(parser('hot\r\ndog')).toEqual({
         case: 'Error',
         error: 'expected "hot\\ndog"',
-        start: {
-          index: 0,
-          line: 0,
-          column: 0
-        },
-        end: {
-          index: 0,
-          line: 0,
-          column: 0
-        }
+        index: 0,
+        line: 0,
+        column: 0
       })
     })
   })
@@ -192,16 +164,9 @@ describe('parser factory', () => {
       expect(parser('')).toEqual({
         case: 'Error',
         error: 'expected "hot"',
-        start: {
-          index: 0,
-          line: 0,
-          column: 0
-        },
-        end: {
-          index: 0,
-          line: 0,
-          column: 0
-        }
+        index: 0,
+        line: 0,
+        column: 0
       })
     })
   })
@@ -251,16 +216,9 @@ describe('parser factory', () => {
       expect(parser('star stroll')).toEqual({
         case: 'Error',
         error: 'expected oneOf("trek", "wars")',
-        start: {
-          index: 0,
-          line: 0,
-          column: 0
-        },
-        end: {
-          index: 5,
-          line: 0,
-          column: 5
-        }
+        index: 5,
+        line: 0,
+        column: 5
       })
     })
   })
@@ -310,16 +268,9 @@ describe('parser factory', () => {
       expect(parser('')).toEqual({
         case: 'Error',
         error: 'expected manyOf("ㅋ")',
-        start: {
-          index: 0,
-          line: 0,
-          column: 0
-        },
-        end: {
-          index: 0,
-          line: 0,
-          column: 0
-        }
+        index: 0,
+        line: 0,
+        column: 0
       })
     })
   })
@@ -411,16 +362,9 @@ describe('parser factory', () => {
       expect(parser('hotcat')).toEqual({
         case: 'Error',
         error: 'expected "dog"',
-        start: {
-          index: 0,
-          line: 0,
-          column: 0
-        },
-        end: {
-          index: 3,
-          line: 0,
-          column: 3
-        }
+        index: 3,
+        line: 0,
+        column: 3
       })
     })
   })

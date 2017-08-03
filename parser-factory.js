@@ -109,13 +109,14 @@ function countLines(source) {
 function build(grammar, form) {
   const operators = {
     String({value, toString}) {
-      return (source, start, end) => {
+      return (source, end) => {
         if (!source.startsWith(value)) {
           return {
             case: 'Error',
             error: `expected ${toString()}`,
-            start,
-            end
+            index: end.index,
+            line: end.line,
+            column: end.column,
           }
         }
 
@@ -123,7 +124,7 @@ function build(grammar, form) {
         return {
           case: 'String',
           value,
-          start: R.clone(end),
+          start: end,
           end: {
             index: end.index + value.length,
             line: end.line + newlineCount,
@@ -137,37 +138,37 @@ function build(grammar, form) {
     },
 
     Array({forms}) {
-      return (source, start, end) => {
+      return (source, end) => {
         const result = R.reduceWhile(
           (previous) => previous.case !== 'Error',
           (previous, form) => {
             const nextSource = seek(source, previous.end.index)
-            const result = build(grammar, form)(nextSource, previous.end, previous.end)
+            const result = build(grammar, form)(nextSource, previous.end)
             if (result.case === 'Error') {
               return Object.assign(
                 {},
                 result,
                 {
-                  start: previous.start,
-                  end: previous.end
+                  index: previous.end.index,
+                  line: previous.end.line,
+                  column: previous.end.column
                 }
               )
             }
             return {
               value: previous.value.concat(result),
-              start: R.clone(end),
+              start: end,
               end: result.end
             }
           },
           {
             value: [],
-            start,
             end
           },
           forms
         )
         if (result.case === 'Error') {
-          return R.omit(['value'], result)
+          return result
         }
         return {
           case: 'Array',
@@ -182,10 +183,10 @@ function build(grammar, form) {
     },
 
     OneOf({forms, toString}) {
-      return (source, start, end) => {
+      return (source, end) => {
         const match = R.reduceWhile(
           (previous) => previous.case === 'Error',
-          (previous, form) => build(grammar, form)(source, end, end),
+          (previous, form) => build(grammar, form)(source, end),
           {
             case: 'Error'
           },
@@ -195,8 +196,9 @@ function build(grammar, form) {
           return {
             case: 'Error',
             error: `expected ${toString()}`,
-            start,
-            end
+            index: end.index,
+            line: end.line,
+            column: end.column
           }
         }
         return match
@@ -204,23 +206,22 @@ function build(grammar, form) {
     },
 
     ManyOf({form, toString}) {
-      return (source, start, end) => {
+      return (source, end) => {
         let previous
         let next = {
           value: [],
-          start,
           end
         }
         do {
           previous = next
           const nextSource = seek(source, previous.end.index)
-          const result = build(grammar, form)(nextSource, previous.end, previous.end)
+          const result = build(grammar, form)(nextSource, previous.end)
           if (result.case === 'Error') {
             break
           }
           next = {
             value: previous.value.concat(result),
-            start: R.clone(end),
+            start: end,
             end: result.end
           }
         } while (true)
@@ -228,8 +229,9 @@ function build(grammar, form) {
           return {
             case: 'Error',
             error: `expected ${toString()}`,
-            start,
-            end
+            index: end.index,
+            line: end.line,
+            column: end.column
           }
         }
         return {
@@ -245,13 +247,13 @@ function build(grammar, form) {
     },
 
     Optional({form}) {
-      return (source, start, end) => {
-        const result = build(grammar, form)(source, start, end)
+      return (source, end) => {
+        const result = build(grammar, form)(source, end)
         if (result.case === 'Error') {
           return {
             case: 'Nothing',
             value: '',
-            start,
+            start: end,
             end,
             asValue() {
               return ''
@@ -263,8 +265,8 @@ function build(grammar, form) {
     },
 
     Ref({node}) {
-      return (source, start, end) => {
-        const result = build(grammar, grammar[node])(source, start, end)
+      return (source, end) => {
+        const result = build(grammar, grammar[node])(source, end)
         if (result.case === 'Error') {
           return result
         }
@@ -297,17 +299,12 @@ function seek(source, index) {
 const self = {
   ParserFactory(grammar) {
     return (source) => {
-      const start = {
-        index: 0,
-        line: 0,
-        column: 0
-      }
       const end = {
         index: 0,
         line: 0,
         column: 0
       }
-      const result = build(normalize(grammar), self.ref('Root'))(source, start, end)
+      const result = build(normalize(grammar), self.ref('Root'))(source, end)
 
       if (result.case === 'Error') {
         return result
@@ -318,8 +315,9 @@ const self = {
         return {
           case: 'Error',
           error: 'unexpected source after Root',
-          start: result.start,
-          end: result.end
+          index: result.end.index,
+          line: result.end.line,
+          column: result.end.column
         }
       }
 
