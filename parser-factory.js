@@ -122,7 +122,7 @@ function build(grammar, form) {
 
         const {newlineCount, lastLineLength} = countLines(value)
         return {
-          case: 'String',
+          case: 'Success',
           value,
           start: pointer,
           end: {
@@ -171,7 +171,7 @@ function build(grammar, form) {
           return result
         }
         return {
-          case: 'Array',
+          case: 'Success',
           value: result.value,
           start: result.start,
           end: result.end,
@@ -235,7 +235,7 @@ function build(grammar, form) {
           }
         }
         return {
-          case: 'Array',
+          case: 'Success',
           value: previous.value,
           start: previous.start,
           end: previous.end,
@@ -251,7 +251,7 @@ function build(grammar, form) {
         const result = build(grammar, form)(source, pointer)
         if (result.case === 'Error') {
           return {
-            case: 'String',
+            case: 'Success',
             value: '',
             start: pointer,
             end: pointer,
@@ -271,13 +271,13 @@ function build(grammar, form) {
           return result
         }
         const self = {
-          case: 'Ref',
-          name,
+          case: 'Success',
+          ref: name,
           value: result.asValue(),
           start: result.start,
           end: result.end,
           asValue() {
-            return R.omit(['asValue'], self)
+            return R.omit(['case', 'asValue'], self)
           }
         }
         return self
