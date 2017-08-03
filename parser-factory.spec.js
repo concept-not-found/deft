@@ -1,4 +1,4 @@
-const {ParserFactory, oneOf, manyOf, optional} = require('./parser-factory')
+const {ParserFactory, oneOf, manyOf, optional, ref} = require('./parser-factory')
 
 describe('parser factory', () => {
   describe('hotdog parser', () => {
@@ -8,7 +8,8 @@ describe('parser factory', () => {
 
     it('should parse exactly hotdog', () => {
       expect(parser('hotdog')).toEqual({
-        case: 'Root',
+        case: 'Ref',
+        node: 'Root',
         value: 'hotdog',
         start: {
           index: 0,
@@ -82,7 +83,8 @@ describe('parser factory', () => {
 
     it('should parse exactly hot\\ndog', () => {
       expect(parser('hot\ndog')).toEqual({
-        case: 'Root',
+        case: 'Ref',
+        node: 'Root',
         value: 'hot\ndog',
         start: {
           index: 0,
@@ -122,7 +124,8 @@ describe('parser factory', () => {
 
     it('should parse exactly hotdog\\n', () => {
       expect(parser('hotdog\n')).toEqual({
-        case: 'Root',
+        case: 'Ref',
+        node: 'Root',
         value: 'hotdog\n',
         start: {
           index: 0,
@@ -145,7 +148,8 @@ describe('parser factory', () => {
 
     it('should parse exactly \\nhotdog', () => {
       expect(parser('\nhotdog')).toEqual({
-        case: 'Root',
+        case: 'Ref',
+        node: 'Root',
         value: '\nhotdog',
         start: {
           index: 0,
@@ -168,7 +172,8 @@ describe('parser factory', () => {
 
     it('should parse exactly hotdog', () => {
       expect(parser('hotdog')).toEqual({
-        case: 'Root',
+        case: 'Ref',
+        node: 'Root',
         value: ['hot', 'dog'],
         start: {
           index: 0,
@@ -208,7 +213,8 @@ describe('parser factory', () => {
 
     it('should parse star trek', () => {
       expect(parser('star trek')).toEqual({
-        case: 'Root',
+        case: 'Ref',
+        node: 'Root',
         value: ['star', ' ', 'trek'],
         start: {
           index: 0,
@@ -225,7 +231,8 @@ describe('parser factory', () => {
 
     it('should parse star wars', () => {
       expect(parser('star wars')).toEqual({
-        case: 'Root',
+        case: 'Ref',
+        node: 'Root',
         value: ['star', ' ', 'wars'],
         start: {
           index: 0,
@@ -265,7 +272,8 @@ describe('parser factory', () => {
 
     it('should parse ㅋ', () => {
       expect(parser('ㅋ')).toEqual({
-        case: 'Root',
+        case: 'Ref',
+        node: 'Root',
         value: ['ㅋ'],
         start: {
           index: 0,
@@ -282,7 +290,8 @@ describe('parser factory', () => {
 
     it('should parse ㅋㅋㅋㅋㅋㅋ', () => {
       expect(parser('ㅋㅋㅋㅋㅋㅋ')).toEqual({
-        case: 'Root',
+        case: 'Ref',
+        node: 'Root',
         value: ['ㅋ', 'ㅋ', 'ㅋ', 'ㅋ', 'ㅋ', 'ㅋ'],
         start: {
           index: 0,
@@ -322,7 +331,8 @@ describe('parser factory', () => {
 
     it('should parse maeby', () => {
       expect(parser('maeby')).toEqual({
-        case: 'Root',
+        case: 'Ref',
+        node: 'Root',
         value: 'maeby',
         start: {
           index: 0,
@@ -339,7 +349,8 @@ describe('parser factory', () => {
 
     it('should parse empty', () => {
       expect(parser('')).toEqual({
-        case: 'Root',
+        case: 'Ref',
+        node: 'Root',
         value: '',
         start: {
           index: 0,
@@ -350,6 +361,65 @@ describe('parser factory', () => {
           index: 0,
           line: 0,
           column: 0
+        }
+      })
+    })
+  })
+
+  describe('hotdog parser with ref', () => {
+    const parser = ParserFactory({
+      Root: ['hot', ref('Animal')],
+      Animal: 'dog'
+    })
+
+    it('should parse hotdog', () => {
+      expect(parser('hotdog')).toEqual({
+        case: 'Ref',
+        node: 'Root',
+        value: [
+          'hot',
+          {
+            case: 'Ref',
+            node: 'Animal',
+            value: 'dog',
+            start: {
+              index: 3,
+              line: 0,
+              column: 3
+            },
+            end: {
+              index: 6,
+              line: 0,
+              column: 6
+            }
+          }
+        ],
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 6,
+          line: 0,
+          column: 6
+        }
+      })
+    })
+
+    it('should fail to parse hotcat', () => {
+      expect(parser('hotcat')).toEqual({
+        case: 'Error',
+        error: 'expected "dog"',
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 3,
+          line: 0,
+          column: 3
         }
       })
     })

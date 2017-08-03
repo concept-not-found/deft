@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-function normalizeForm(form, node) {
+function normalizeForm(form) {
   if (typeof form === 'string') {
     return {
       case: 'String',
@@ -15,7 +15,7 @@ function normalizeForm(form, node) {
     const forms = form
     const self = {
       case: 'Array',
-      forms: forms.map((form) => normalizeForm(form, node)),
+      forms: forms.map(normalizeForm),
       toString() {
         return `[${self.forms.map((form) => form.toString()).join(', ')}]`
       }
@@ -27,7 +27,7 @@ function normalizeForm(form, node) {
     OneOf({forms}) {
       const self = {
         case: 'OneOf',
-        forms: forms.map((subform) => normalizeForm(subform, node)),
+        forms: forms.map(normalizeForm),
         toString() {
           return `oneOf(${self.forms.map((form) => form.toString()).join(', ')})`
         }
@@ -38,7 +38,7 @@ function normalizeForm(form, node) {
     ManyOf({form}) {
       const self = {
         case: 'ManyOf',
-        form: normalizeForm(form, node),
+        form: normalizeForm(form),
         toString() {
           return `manyOf(${self.form.toString()})`
         }
@@ -49,37 +49,31 @@ function normalizeForm(form, node) {
     Optional({form}) {
       const self = {
         case: 'Optional',
-        form: normalizeForm(form, node),
+        form: normalizeForm(form),
         toString() {
           return `optional(${self.form.toString()})`
         }
       }
       return self
+    },
+
+    Ref({node}) {
+      return {
+        case: 'Ref',
+        node
+      }
     }
   }
 
   const normalizer = normalizers[form.case]
   if (!normalizer) {
-    throw new Error(`unsupported form ${JSON.stringify(form)} for node ${node}`)
+    throw new Error(`unsupported form ${JSON.stringify(form)}`)
   }
   return normalizer(form)
 }
 
 function normalize(grammar) {
   return R.mapObjIndexed(normalizeForm, grammar)
-}
-
-
-function build(grammar, node) {
-  if (node === 'Error') {
-    throw new Error('grammar cannot use reserved node name "Error"')
-  }
-
-  const form = grammar[node]
-  if (!form) {
-    throw new Error(`grammar does not contain the node named "${node}"`)
-  }
-  return buildForm(grammar, node, form)
 }
 
 function countLines(source) {
@@ -112,7 +106,7 @@ function countLines(source) {
   }
 }
 
-function buildForm(grammar, node, form) {
+function build(grammar, form) {
   const operators = {
     String({value, toString}) {
       return (source, start, end) => {
@@ -127,13 +121,16 @@ function buildForm(grammar, node, form) {
 
         const {newlineCount, lastLineLength} = countLines(value)
         return {
-          case: node,
+          case: 'String',
           value,
           start: R.clone(end),
           end: {
             index: end.index + value.length,
             line: end.line + newlineCount,
             column: end.column + lastLineLength
+          },
+          asValue() {
+            return value
           }
         }
       }
@@ -145,20 +142,22 @@ function buildForm(grammar, node, form) {
           (previous) => previous.case !== 'Error',
           (previous, form) => {
             const nextSource = seek(source, previous.end.index)
-            const result = buildForm(grammar, node, form)(nextSource, start, end)
-            return Object.assign(
-              {},
-              result,
-              {
-                value: previous.value.concat(result.value),
-                start: R.clone(end),
-                end: {
-                  index: previous.end.index + result.end.index,
-                  line: previous.end.line + result.end.line,
-                  column: previous.end.column + result.end.column
+            const result = build(grammar, form)(nextSource, previous.end, previous.end)
+            if (result.case === 'Error') {
+              return Object.assign(
+                {},
+                result,
+                {
+                  start: previous.start,
+                  end: previous.end
                 }
-              }
-            )
+              )
+            }
+            return {
+              value: previous.value.concat(result),
+              start: R.clone(end),
+              end: result.end
+            }
           },
           {
             value: [],
@@ -170,7 +169,15 @@ function buildForm(grammar, node, form) {
         if (result.case === 'Error') {
           return R.omit(['value'], result)
         }
-        return result
+        return {
+          case: 'Array',
+          value: result.value,
+          start: result.start,
+          end: result.end,
+          asValue() {
+            return result.value.map((val) => val.asValue())
+          }
+        }
       }
     },
 
@@ -178,7 +185,7 @@ function buildForm(grammar, node, form) {
       return (source, start, end) => {
         const match = R.reduceWhile(
           (previous) => previous.case === 'Error',
-          (previous, form) => buildForm(grammar, node, form)(source, start, end),
+          (previous, form) => build(grammar, form)(source, end, end),
           {
             case: 'Error'
           },
@@ -207,22 +214,17 @@ function buildForm(grammar, node, form) {
         do {
           previous = next
           const nextSource = seek(source, previous.end.index)
-          const result = buildForm(grammar, node, form)(nextSource, start, end)
-          next = Object.assign(
-            {},
-            result,
-            {
-              value: previous.value.concat(result.value),
-              start: R.clone(end),
-              end: {
-                index: previous.end.index + result.end.index,
-                line: previous.end.line + result.end.line,
-                column: previous.end.column + result.end.column
-              }
-            }
-          )
-        } while (next.case !== 'Error')
-        if (!previous.case) {
+          const result = build(grammar, form)(nextSource, previous.end, previous.end)
+          if (result.case === 'Error') {
+            break
+          }
+          next = {
+            value: previous.value.concat(result),
+            start: R.clone(end),
+            end: result.end
+          }
+        } while (true)
+        if (previous.value.length === 0) {
           return {
             case: 'Error',
             error: `expected ${toString()}`,
@@ -230,22 +232,53 @@ function buildForm(grammar, node, form) {
             end
           }
         }
-        return previous
+        return {
+          case: 'Array',
+          value: previous.value,
+          start: previous.start,
+          end: previous.end,
+          asValue() {
+            return previous.value.map((val) => val.asValue())
+          }
+        }
       }
     },
 
     Optional({form}) {
       return (source, start, end) => {
-        const result = buildForm(grammar, node, form)(source, start, end)
+        const result = build(grammar, form)(source, start, end)
         if (result.case === 'Error') {
           return {
-            case: node,
+            case: 'Nothing',
             value: '',
             start,
-            end
+            end,
+            asValue() {
+              return ''
+            }
           }
         }
         return result
+      }
+    },
+
+    Ref({node}) {
+      return (source, start, end) => {
+        const result = build(grammar, grammar[node])(source, start, end)
+        if (result.case === 'Error') {
+          return result
+        }
+        const self = {
+          case: 'Ref',
+          node,
+          value: result.asValue(),
+          start: result.start,
+          end: result.end,
+          asValue() {
+            return R.omit(['asValue'], self)
+          }
+        }
+        return self
       }
     }
   }
@@ -261,7 +294,7 @@ function seek(source, index) {
   return R.drop(index, source)
 }
 
-module.exports = {
+const self = {
   ParserFactory(grammar) {
     return (source) => {
       const start = {
@@ -274,20 +307,23 @@ module.exports = {
         line: 0,
         column: 0
       }
-      const result = build(normalize(grammar), 'Root')(source, start, end)
+      const result = build(normalize(grammar), self.ref('Root'))(source, start, end)
 
-      if (result.case !== 'Error') {
-        const remainingSource = seek(source, result.end.index)
-        if (remainingSource) {
-          return {
-            case: 'Error',
-            error: 'unexpected source after Root',
-            start: result.start,
-            end: result.end
-          }
+      if (result.case === 'Error') {
+        return result
+      }
+
+      const remainingSource = seek(source, result.end.index)
+      if (remainingSource) {
+        return {
+          case: 'Error',
+          error: 'unexpected source after Root',
+          start: result.start,
+          end: result.end
         }
       }
-      return result
+
+      return result.asValue()
     }
   },
 
@@ -310,5 +346,14 @@ module.exports = {
       case: 'Optional',
       form
     }
+  },
+
+  ref(node) {
+    return {
+      case: 'Ref',
+      node
+    }
   }
 }
+
+module.exports = self

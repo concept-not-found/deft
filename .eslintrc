@@ -53,7 +53,12 @@
       }
     ],
     "arrow-spacing": "error",
-    "no-constant-condition": "error",
+    "no-constant-condition": [
+      "error",
+      {
+        "checkLoops": false
+      }
+    ],
     "no-class-assign": "error",
     "no-const-assign": "error",
     "no-dupe-class-members": "error",
