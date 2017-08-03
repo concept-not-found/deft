@@ -1,83 +1,6 @@
 const R = require('ramda')
-
-function normalizeForm(form) {
-  if (typeof form === 'string') {
-    return {
-      case: 'String',
-      value: form,
-      toString() {
-        return JSON.stringify(form)
-      }
-    }
-  }
-
-  if (form instanceof Array) {
-    const forms = form
-    const self = {
-      case: 'Array',
-      forms: forms.map(normalizeForm),
-      toString() {
-        return `[${self.forms.map((form) => form.toString()).join(', ')}]`
-      }
-    }
-    return self
-  }
-
-  const normalizers = {
-    OneOf({forms}) {
-      const self = {
-        case: 'OneOf',
-        forms: forms.map(normalizeForm),
-        toString() {
-          return `oneOf(${self.forms.map((form) => form.toString()).join(', ')})`
-        }
-      }
-      return self
-    },
-
-    ManyOf({form}) {
-      const self = {
-        case: 'ManyOf',
-        form: normalizeForm(form),
-        toString() {
-          return `manyOf(${self.form.toString()})`
-        }
-      }
-      return self
-    },
-
-    Optional({form}) {
-      const self = {
-        case: 'Optional',
-        form: normalizeForm(form),
-        toString() {
-          return `optional(${self.form.toString()})`
-        }
-      }
-      return self
-    },
-
-    Ref({name}) {
-      return {
-        case: 'Ref',
-        name,
-        toString() {
-          return `ref("${name}")`
-        }
-      }
-    }
-  }
-
-  const normalizer = normalizers[form.case]
-  if (!normalizer) {
-    throw new Error(`unsupported form ${JSON.stringify(form)}`)
-  }
-  return normalizer(form)
-}
-
-function normalize(grammar) {
-  return R.mapObjIndexed(normalizeForm, grammar)
-}
+const match = require('./match')
+const normalize = require('./grammar-normalizer')
 
 function countLines(source) {
   let count = 0
@@ -109,179 +32,161 @@ function countLines(source) {
   }
 }
 
-function build(grammar, form) {
-  const operators = {
+function parse(grammar, form, source, pointer) {
+  return match({
     String({value, toString}) {
-      return (source, pointer) => {
-        if (!source.startsWith(value)) {
-          return {
-            case: 'Error',
-            error: `expected ${toString()}`,
-            pointer
-          }
-        }
-
-        const {newlineCount, lastLineLength} = countLines(value)
+      if (!source.startsWith(value)) {
         return {
-          case: 'Success',
-          value,
-          start: pointer,
-          end: {
-            index: pointer.index + value.length,
-            line: pointer.line + newlineCount,
-            column: pointer.column + lastLineLength
-          },
-          asValue() {
-            return value
-          }
+          case: 'Error',
+          error: `expected ${toString()}`,
+          pointer
+        }
+      }
+
+      const {newlineCount, lastLineLength} = countLines(value)
+      return {
+        case: 'Success',
+        value,
+        start: pointer,
+        end: {
+          index: pointer.index + value.length,
+          line: pointer.line + newlineCount,
+          column: pointer.column + lastLineLength
+        },
+        asValue() {
+          return value
         }
       }
     },
 
     Array({forms}) {
-      return (source, pointer) => {
-        const result = R.reduceWhile(
-          (previous) => previous.case !== 'Error',
-          (previous, form) => {
-            const nextSource = seek(source, previous.end.index)
-            const result = build(grammar, form)(nextSource, previous.end)
-            if (result.case === 'Error') {
-              return result
-            }
-            return {
-              value: previous.value.concat(result),
-              start: pointer,
-              end: result.end
-            }
-          },
-          {
-            value: [],
-            end: pointer
-          },
-          forms
-        )
-        if (result.case === 'Error') {
-          return result
-        }
-        return {
-          case: 'Success',
-          value: result.value,
-          start: result.start,
-          end: result.end,
-          asValue() {
-            return result.value.map((val) => val.asValue())
+      const result = R.reduceWhile(
+        (previous) => previous.case !== 'Error',
+        (previous, form) => {
+          const nextSource = seek(source, previous.end.index)
+          const result = parse(grammar, form, nextSource, previous.end)
+          if (result.case === 'Error') {
+            return result
           }
+          return {
+            value: previous.value.concat(result),
+            start: pointer,
+            end: result.end
+          }
+        },
+        {
+          value: [],
+          end: pointer
+        },
+        forms
+      )
+      if (result.case === 'Error') {
+        return result
+      }
+      return {
+        case: 'Success',
+        value: result.value,
+        start: result.start,
+        end: result.end,
+        asValue() {
+          return result.value.map((val) => val.asValue())
         }
       }
     },
 
     OneOf({forms, toString}) {
-      return (source, pointer) => {
-        const match = R.reduceWhile(
-          (previous) => previous.case === 'Error',
-          (previous, form) => build(grammar, form)(source, pointer),
-          {
-            case: 'Error'
-          },
-          forms
-        )
-        if (match.case === 'Error') {
-          return {
-            case: 'Error',
-            error: `expected ${toString()}`,
-            pointer
-          }
+      const match = R.reduceWhile(
+        (previous) => previous.case === 'Error',
+        (previous, form) => parse(grammar, form, source, pointer),
+        {
+          case: 'Error'
+        },
+        forms
+      )
+      if (match.case === 'Error') {
+        return {
+          case: 'Error',
+          error: `expected ${toString()}`,
+          pointer
         }
-        return match
       }
+      return match
     },
 
     ManyOf({form, toString}) {
-      return (source, pointer) => {
-        let previous
-        let next = {
-          value: [],
-          end: pointer
+      let previous
+      let next = {
+        value: [],
+        end: pointer
+      }
+      do {
+        previous = next
+        const nextSource = seek(source, previous.end.index)
+        const result = parse(grammar, form, nextSource, previous.end)
+        if (result.case === 'Error') {
+          break
         }
-        do {
-          previous = next
-          const nextSource = seek(source, previous.end.index)
-          const result = build(grammar, form)(nextSource, previous.end)
-          if (result.case === 'Error') {
-            break
-          }
-          next = {
-            value: previous.value.concat(result),
-            start: pointer,
-            end: result.end
-          }
-        } while (true)
-        if (previous.value.length === 0) {
-          return {
-            case: 'Error',
-            error: `expected ${toString()}`,
-            pointer
-          }
+        next = {
+          value: previous.value.concat(result),
+          start: pointer,
+          end: result.end
         }
+      } while (true)
+      if (previous.value.length === 0) {
         return {
-          case: 'Success',
-          value: previous.value,
-          start: previous.start,
-          end: previous.end,
-          asValue() {
-            return previous.value.map((val) => val.asValue())
-          }
+          case: 'Error',
+          error: `expected ${toString()}`,
+          pointer
+        }
+      }
+      return {
+        case: 'Success',
+        value: previous.value,
+        start: previous.start,
+        end: previous.end,
+        asValue() {
+          return previous.value.map((val) => val.asValue())
         }
       }
     },
 
     Optional({form}) {
-      return (source, pointer) => {
-        const result = build(grammar, form)(source, pointer)
-        if (result.case === 'Error') {
-          return {
-            case: 'Success',
-            value: '',
-            start: pointer,
-            end: pointer,
-            asValue() {
-              return ''
-            }
+      const result = parse(grammar, form, source, pointer)
+      if (result.case === 'Error') {
+        return {
+          case: 'Success',
+          value: '',
+          start: pointer,
+          end: pointer,
+          asValue() {
+            return ''
           }
         }
-        return result
       }
+      return result
     },
 
     Ref({name}) {
-      return (source, pointer) => {
-        const result = build(grammar, grammar[name])(source, pointer)
-        if (result.case === 'Error') {
-          if (!result.ref) {
-            result.ref = name
-          }
-          return result
+      const result = parse(grammar, grammar[name], source, pointer)
+      if (result.case === 'Error') {
+        if (!result.ref) {
+          result.ref = name
         }
-        const self = {
-          case: 'Success',
-          ref: name,
-          value: result.asValue(),
-          start: result.start,
-          end: result.end,
-          asValue() {
-            return R.omit(['case', 'asValue'], self)
-          }
-        }
-        return self
+        return result
       }
+      const self = {
+        case: 'Success',
+        ref: name,
+        value: result.asValue(),
+        start: result.start,
+        end: result.end,
+        asValue() {
+          return R.omit(['case', 'asValue'], self)
+        }
+      }
+      return self
     }
-  }
-
-  if (!operators[form.case]) {
-    throw new Error('unsupported')
-  }
-
-  return operators[form.case](form)
+  })(form)
 }
 
 function seek(source, index) {
@@ -296,7 +201,7 @@ const self = {
         line: 0,
         column: 0
       }
-      const result = build(normalize(grammar), self.ref('Root'))(source, pointer)
+      const result = parse(normalize(grammar), self.ref('Root'), source, pointer)
 
       if (result.case === 'Error') {
         return result
