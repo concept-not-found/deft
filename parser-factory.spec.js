@@ -29,9 +29,11 @@ describe('parser factory', () => {
         case: 'Error',
         ref: 'Root',
         error: 'expected "hotdog"',
-        index: 0,
-        line: 0,
-        column: 0
+        pointer: {
+          index: 0,
+          line: 0,
+          column: 0
+        }
       })
     })
 
@@ -40,9 +42,11 @@ describe('parser factory', () => {
         case: 'Error',
         ref: 'Root',
         error: 'expected "hotdog"',
-        index: 0,
-        line: 0,
-        column: 0
+        pointer: {
+          index: 0,
+          line: 0,
+          column: 0
+        }
       })
     })
 
@@ -51,9 +55,11 @@ describe('parser factory', () => {
         case: 'Error',
         ref: 'Root',
         error: 'unexpected source after Root',
-        index: 6,
-        line: 0,
-        column: 6
+        pointer: {
+          index: 6,
+          line: 0,
+          column: 6
+        }
       })
     })
   })
@@ -86,9 +92,11 @@ describe('parser factory', () => {
         case: 'Error',
         ref: 'Root',
         error: 'expected "hot\\ndog"',
-        index: 0,
-        line: 0,
-        column: 0
+        pointer: {
+          index: 0,
+          line: 0,
+          column: 0
+        }
       })
     })
   })
@@ -169,9 +177,11 @@ describe('parser factory', () => {
         case: 'Error',
         ref: 'Root',
         error: 'expected "hot"',
-        index: 0,
-        line: 0,
-        column: 0
+        pointer: {
+          index: 0,
+          line: 0,
+          column: 0
+        }
       })
     })
   })
@@ -222,9 +232,11 @@ describe('parser factory', () => {
         case: 'Error',
         ref: 'Root',
         error: 'expected oneOf("trek", "wars")',
-        index: 5,
-        line: 0,
-        column: 5
+        pointer: {
+          index: 5,
+          line: 0,
+          column: 5
+        }
       })
     })
   })
@@ -275,9 +287,11 @@ describe('parser factory', () => {
         case: 'Error',
         ref: 'Root',
         error: 'expected manyOf("ㅋ")',
-        index: 0,
-        line: 0,
-        column: 0
+        pointer: {
+          index: 0,
+          line: 0,
+          column: 0
+        }
       })
     })
   })
@@ -370,9 +384,11 @@ describe('parser factory', () => {
         case: 'Error',
         ref: 'Animal',
         error: 'expected "dog"',
-        index: 3,
-        line: 0,
-        column: 3
+        pointer: {
+          index: 3,
+          line: 0,
+          column: 3
+        }
       })
     })
   })

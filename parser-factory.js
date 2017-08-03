@@ -117,9 +117,7 @@ function build(grammar, form) {
           return {
             case: 'Error',
             error: `expected ${toString()}`,
-            index: pointer.index,
-            line: pointer.line,
-            column: pointer.column,
+            pointer
           }
         }
 
@@ -152,9 +150,7 @@ function build(grammar, form) {
                 {},
                 result,
                 {
-                  index: previous.end.index,
-                  line: previous.end.line,
-                  column: previous.end.column
+                  pointer: previous.end
                 }
               )
             }
@@ -199,9 +195,7 @@ function build(grammar, form) {
           return {
             case: 'Error',
             error: `expected ${toString()}`,
-            index: pointer.index,
-            line: pointer.line,
-            column: pointer.column
+            pointer
           }
         }
         return match
@@ -232,9 +226,7 @@ function build(grammar, form) {
           return {
             case: 'Error',
             error: `expected ${toString()}`,
-            index: pointer.index,
-            line: pointer.line,
-            column: pointer.column
+            pointer
           }
         }
         return {
@@ -322,9 +314,7 @@ const self = {
           case: 'Error',
           ref: 'Root',
           error: 'unexpected source after Root',
-          index: result.end.index,
-          line: result.end.line,
-          column: result.end.column
+          pointer: result.end
         }
       }
 
