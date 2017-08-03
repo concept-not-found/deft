@@ -277,8 +277,8 @@ function build(grammar, form) {
           return result
         }
         const self = {
-          case: 'Ref',
-          name,
+          case: 'Success',
+          ref: name,
           value: result.asValue(),
           start: result.start,
           end: result.end,
