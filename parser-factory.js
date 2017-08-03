@@ -12,11 +12,12 @@ function normalizeForm(form, node) {
   }
 
   if (form instanceof Array) {
+    const forms = form
     const self = {
       case: 'Array',
-      elements: form.map((subform) => normalizeForm(subform, node)),
+      forms: forms.map((form) => normalizeForm(form, node)),
       toString() {
-        return `[${self.elements.map((element) => element.toString()).join(', ')}]`
+        return `[${self.forms.map((form) => form.toString()).join(', ')}]`
       }
     }
     return self
@@ -136,7 +137,7 @@ function buildForm(grammar, node, form) {
       }
     },
 
-    Array({elements}) {
+    Array({forms}) {
       return (source, index, line, column) => {
         const result = R.reduceWhile(
           (previous) => previous.case !== 'Error',
@@ -160,7 +161,7 @@ function buildForm(grammar, node, form) {
             line,
             column
           },
-          elements
+          forms
         )
         if (result.case === 'Error') {
           return R.omit(['value'], result)
