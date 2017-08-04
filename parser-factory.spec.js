@@ -437,7 +437,25 @@ describe('parser factory', () => {
       expect(parser('')).toEqual({
         type: 'Error',
         ref: 'Root',
-        error: 'circular reference detected ["ref Root @ index 0"]',
+        error: 'circular reference detected {ref("Root") @ 0}',
+        pointer: {
+          index: 0,
+          line: 0,
+          column: 0
+        }
+      })
+    })
+
+    it('should detect A -> B -> A', () => {
+      const parser = ParserFactory({
+        Root: ref('A'),
+        A: ref('B'),
+        B: ref('A')
+      })
+      expect(parser('')).toEqual({
+        type: 'Error',
+        ref: 'B',
+        error: 'circular reference detected {ref("Root") @ 0, ref("A") @ 0, ref("B") @ 0}',
         pointer: {
           index: 0,
           line: 0,

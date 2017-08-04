@@ -138,11 +138,11 @@ function FormParserFactory(grammar, source) {
       },
 
       Ref({name}) {
-        const currentRef = `ref ${name} @ index ${pointer.index}`
+        const currentRef = `ref("${name}") @ ${pointer.index}`
         if (seenRefs.has(currentRef)) {
           return {
             type: 'Error',
-            error: `circular reference detected ${JSON.stringify([...seenRefs.values()])}`,
+            error: `circular reference detected {${[...seenRefs.values()].join(', ')}}`,
             pointer
           }
         }
