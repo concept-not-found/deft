@@ -101,6 +101,43 @@ describe('parser factory', () => {
     })
   })
 
+  describe('win\\r\\ndoze parser', () => {
+    const parser = ParserFactory({
+      Root: 'win\r\ndoze'
+    })
+
+    it('should parse exactly win\\r\\ndoze', () => {
+      expect(parser('win\r\ndoze')).toEqual({
+        type: 'Success',
+        ref: 'Root',
+        value: 'win\r\ndoze',
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 9,
+          line: 1,
+          column: 4
+        }
+      })
+    })
+
+    it('should fail to parse hot\\r\\ndog', () => {
+      expect(parser('hot\r\ndog')).toEqual({
+        type: 'Error',
+        ref: 'Root',
+        error: 'expected "win\\r\\ndoze"',
+        pointer: {
+          index: 0,
+          line: 0,
+          column: 0
+        }
+      })
+    })
+  })
+
   describe('hotdog\\n parser', () => {
     const parser = ParserFactory({
       Root: 'hotdog\n'

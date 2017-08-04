@@ -121,7 +121,7 @@ function FormParserFactory(grammar, source) {
       },
 
       Optional({form}) {
-        const result = parseForm(form,  pointer)
+        const result = parseForm(form, pointer)
         if (result.type === 'Error') {
           return {
             type: 'Success',

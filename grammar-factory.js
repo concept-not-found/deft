@@ -7,7 +7,7 @@ function normalize(form) {
       type: 'String',
       value: form,
       toString() {
-        return JSON.stringify(form)
+        return `"${form}"`
       }
     }
   }
