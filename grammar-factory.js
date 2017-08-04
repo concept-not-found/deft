@@ -2,10 +2,10 @@ const R = require('ramda')
 const match = require('./match')
 
 function normalize(form) {
-  if (typeof form === 'string') {
+  if (typeof form === 'string' || typeof form === 'number' || typeof form === 'boolean') {
     return {
       type: 'String',
-      value: form,
+      value: String(form),
       toString() {
         return JSON.stringify(form)
       }

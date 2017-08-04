@@ -429,6 +429,106 @@ describe('parser factory', () => {
     })
   })
 
+  describe('A -> (A+A) | 1 parser', () => {
+    const parser = ParserFactory({
+      Root: ref('A'),
+      A: oneOf(['(', ref('A'), '+', ref('A'), ')'], 1)
+    })
+
+    it('should parse 1', () => {
+      expect(parser('1')).toEqual({
+        type: 'Success',
+        ref: 'Root',
+        value: {
+          ref: 'A',
+          value: '1',
+          start: {
+            index: 0,
+            line: 0,
+            column: 0
+          },
+          end: {
+            index: 1,
+            line: 0,
+            column: 1
+          }
+        },
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 1,
+          line: 0,
+          column: 1
+        }
+      })
+    })
+
+    it('should parse (1+1)', () => {
+      expect(parser('(1+1)')).toEqual({
+        type: 'Success',
+        ref: 'Root',
+        value: {
+          ref: 'A',
+          value: [
+            '(',
+            {
+              ref: 'A',
+              value: '1',
+              start: {
+                index: 1,
+                line: 0,
+                column: 1
+              },
+              end: {
+                index: 2,
+                line: 0,
+                column: 2
+              }
+            },
+            '+',
+            {
+              ref: 'A',
+              value: '1',
+              start: {
+                index: 3,
+                line: 0,
+                column: 3
+              },
+              end: {
+                index: 4,
+                line: 0,
+                column: 4
+              }
+            },
+            ')'
+          ],
+          start: {
+            index: 0,
+            line: 0,
+            column: 0
+          },
+          end: {
+            index: 5,
+            line: 0,
+            column: 5
+          }
+        },
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 5,
+          line: 0,
+          column: 5
+        }
+      })
+    })
+  })
   describe('circular references', () => {
     it('should detect Root -> Root', () => {
       const parser = ParserFactory({
