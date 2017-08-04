@@ -90,7 +90,7 @@ function FormParserFactory(grammar, source) {
           value: [],
           end: pointer
         }
-        do {
+        while (true) {
           previous = next
           const result = parseForm(form,  previous.end)
           if (result.type === 'Error') {
@@ -101,7 +101,7 @@ function FormParserFactory(grammar, source) {
             start: pointer,
             end: result.end
           }
-        } while (true)
+        }
         if (previous.value.length === 0) {
           return {
             type: 'Error',
