@@ -1,8 +1,8 @@
-module.exports = (caseHandlers) => (message) => {
-  const caseName = message.case
-  const handler = caseHandlers[caseName]
+module.exports = (handlers) => (message) => {
+  const type = message.type
+  const handler = handlers[type]
   if (!handler) {
-    throw new Error(`case ${caseName} not found in ${Object.keys(caseHandlers)}`)
+    throw new Error(`type ${type} not found in ${Object.keys(handlers)}`)
   }
   return handler(message)
 }

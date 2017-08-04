@@ -8,7 +8,7 @@ describe('parser factory', () => {
 
     it('should parse exactly hotdog', () => {
       expect(parser('hotdog')).toEqual({
-        case: 'Success',
+        type: 'Success',
         ref: 'Root',
         value: 'hotdog',
         start: {
@@ -26,7 +26,7 @@ describe('parser factory', () => {
 
     it('should fail to parse empty', () => {
       expect(parser('')).toEqual({
-        case: 'Error',
+        type: 'Error',
         ref: 'Root',
         error: 'expected "hotdog"',
         pointer: {
@@ -39,7 +39,7 @@ describe('parser factory', () => {
 
     it('should fail to parse not hotdog', () => {
       expect(parser('not hotdog')).toEqual({
-        case: 'Error',
+        type: 'Error',
         ref: 'Root',
         error: 'expected "hotdog"',
         pointer: {
@@ -52,7 +52,7 @@ describe('parser factory', () => {
 
     it('should fail to parse hotdog in your mouth', () => {
       expect(parser('hotdog in your mouth')).toEqual({
-        case: 'Error',
+        type: 'Error',
         ref: 'Root',
         error: 'unexpected source after Root',
         pointer: {
@@ -71,7 +71,7 @@ describe('parser factory', () => {
 
     it('should parse exactly hot\\ndog', () => {
       expect(parser('hot\ndog')).toEqual({
-        case: 'Success',
+        type: 'Success',
         ref: 'Root',
         value: 'hot\ndog',
         start: {
@@ -89,7 +89,7 @@ describe('parser factory', () => {
 
     it('should fail to parse hot\\r\\ndog', () => {
       expect(parser('hot\r\ndog')).toEqual({
-        case: 'Error',
+        type: 'Error',
         ref: 'Root',
         error: 'expected "hot\\ndog"',
         pointer: {
@@ -108,7 +108,7 @@ describe('parser factory', () => {
 
     it('should parse exactly hotdog\\n', () => {
       expect(parser('hotdog\n')).toEqual({
-        case: 'Success',
+        type: 'Success',
         ref: 'Root',
         value: 'hotdog\n',
         start: {
@@ -132,7 +132,7 @@ describe('parser factory', () => {
 
     it('should parse exactly \\nhotdog', () => {
       expect(parser('\nhotdog')).toEqual({
-        case: 'Success',
+        type: 'Success',
         ref: 'Root',
         value: '\nhotdog',
         start: {
@@ -156,7 +156,7 @@ describe('parser factory', () => {
 
     it('should parse exactly hotdog', () => {
       expect(parser('hotdog')).toEqual({
-        case: 'Success',
+        type: 'Success',
         ref: 'Root',
         value: ['hot', 'dog'],
         start: {
@@ -174,7 +174,7 @@ describe('parser factory', () => {
 
     it('should fail to parse empty', () => {
       expect(parser('')).toEqual({
-        case: 'Error',
+        type: 'Error',
         ref: 'Root',
         error: 'expected "hot"',
         pointer: {
@@ -193,7 +193,7 @@ describe('parser factory', () => {
 
     it('should parse star trek', () => {
       expect(parser('star trek')).toEqual({
-        case: 'Success',
+        type: 'Success',
         ref: 'Root',
         value: ['star', ' ', 'trek'],
         start: {
@@ -211,7 +211,7 @@ describe('parser factory', () => {
 
     it('should parse star wars', () => {
       expect(parser('star wars')).toEqual({
-        case: 'Success',
+        type: 'Success',
         ref: 'Root',
         value: ['star', ' ', 'wars'],
         start: {
@@ -229,7 +229,7 @@ describe('parser factory', () => {
 
     it('should fail to parse star stroll', () => {
       expect(parser('star stroll')).toEqual({
-        case: 'Error',
+        type: 'Error',
         ref: 'Root',
         error: 'expected oneOf("trek", "wars")',
         pointer: {
@@ -248,7 +248,7 @@ describe('parser factory', () => {
 
     it('should parse ㅋ', () => {
       expect(parser('ㅋ')).toEqual({
-        case: 'Success',
+        type: 'Success',
         ref: 'Root',
         value: ['ㅋ'],
         start: {
@@ -266,7 +266,7 @@ describe('parser factory', () => {
 
     it('should parse ㅋㅋㅋㅋㅋㅋ', () => {
       expect(parser('ㅋㅋㅋㅋㅋㅋ')).toEqual({
-        case: 'Success',
+        type: 'Success',
         ref: 'Root',
         value: ['ㅋ', 'ㅋ', 'ㅋ', 'ㅋ', 'ㅋ', 'ㅋ'],
         start: {
@@ -284,7 +284,7 @@ describe('parser factory', () => {
 
     it('should fail to parse empty', () => {
       expect(parser('')).toEqual({
-        case: 'Error',
+        type: 'Error',
         ref: 'Root',
         error: 'expected manyOf("ㅋ")',
         pointer: {
@@ -303,7 +303,7 @@ describe('parser factory', () => {
 
     it('should parse maeby', () => {
       expect(parser('maeby')).toEqual({
-        case: 'Success',
+        type: 'Success',
         ref: 'Root',
         value: 'maeby',
         start: {
@@ -321,7 +321,7 @@ describe('parser factory', () => {
 
     it('should parse empty', () => {
       expect(parser('')).toEqual({
-        case: 'Success',
+        type: 'Success',
         ref: 'Root',
         value: '',
         start: {
@@ -346,7 +346,7 @@ describe('parser factory', () => {
 
     it('should parse hotdog', () => {
       expect(parser('hotdog')).toEqual({
-        case: 'Success',
+        type: 'Success',
         ref: 'Root',
         value: [
           'hot',
@@ -380,7 +380,7 @@ describe('parser factory', () => {
 
     it('should fail to parse hotcat', () => {
       expect(parser('hotcat')).toEqual({
-        case: 'Error',
+        type: 'Error',
         ref: 'Animal',
         error: 'expected "dog"',
         pointer: {

@@ -4,7 +4,7 @@ const match = require('./match')
 function normalize(form) {
   if (typeof form === 'string') {
     return {
-      case: 'String',
+      type: 'String',
       value: form,
       toString() {
         return JSON.stringify(form)
@@ -15,7 +15,7 @@ function normalize(form) {
   if (form instanceof Array) {
     const forms = form
     const self = {
-      case: 'Array',
+      type: 'Array',
       forms: forms.map(normalize),
       toString() {
         return `[${self.forms.map((form) => form.toString()).join(', ')}]`
@@ -27,7 +27,7 @@ function normalize(form) {
   return match({
     OneOf({forms}) {
       const self = {
-        case: 'OneOf',
+        type: 'OneOf',
         forms: forms.map(normalize),
         toString() {
           return `oneOf(${self.forms.map((form) => form.toString()).join(', ')})`
@@ -38,7 +38,7 @@ function normalize(form) {
 
     ManyOf({form}) {
       const self = {
-        case: 'ManyOf',
+        type: 'ManyOf',
         form: normalize(form),
         toString() {
           return `manyOf(${self.form.toString()})`
@@ -49,7 +49,7 @@ function normalize(form) {
 
     Optional({form}) {
       const self = {
-        case: 'Optional',
+        type: 'Optional',
         form: normalize(form),
         toString() {
           return `optional(${self.form.toString()})`
@@ -60,7 +60,7 @@ function normalize(form) {
 
     Ref({name}) {
       return {
-        case: 'Ref',
+        type: 'Ref',
         name,
         toString() {
           return `ref("${name}")`
@@ -78,28 +78,28 @@ module.exports = {
 
   oneOf(...forms) {
     return {
-      case: 'OneOf',
+      type: 'OneOf',
       forms
     }
   },
 
   manyOf(form) {
     return {
-      case: 'ManyOf',
+      type: 'ManyOf',
       form
     }
   },
 
   optional(form) {
     return {
-      case: 'Optional',
+      type: 'Optional',
       form
     }
   },
 
   ref(name) {
     return {
-      case: 'Ref',
+      type: 'Ref',
       name
     }
   }

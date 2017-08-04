@@ -9,7 +9,7 @@ function FormParserFactory(grammar, source) {
       String({value, toString}) {
         if (source.substr(pointer.index, value.length) !== value) {
           return {
-            case: 'Error',
+            type: 'Error',
             error: `expected ${toString()}`,
             pointer
           }
@@ -17,7 +17,7 @@ function FormParserFactory(grammar, source) {
 
         const {newlineCount, lastLineLength} = countLines(value)
         return {
-          case: 'Success',
+          type: 'Success',
           value,
           start: pointer,
           end: {
@@ -33,10 +33,10 @@ function FormParserFactory(grammar, source) {
 
       Array({forms}) {
         const result = R.reduceWhile(
-          (previous) => previous.case !== 'Error',
+          (previous) => previous.type !== 'Error',
           (previous, form) => {
             const result = parseForm(form, previous.end)
-            if (result.case === 'Error') {
+            if (result.type === 'Error') {
               return result
             }
             return {
@@ -51,11 +51,11 @@ function FormParserFactory(grammar, source) {
           },
           forms
         )
-        if (result.case === 'Error') {
+        if (result.type === 'Error') {
           return result
         }
         return {
-          case: 'Success',
+          type: 'Success',
           value: result.value,
           start: result.start,
           end: result.end,
@@ -67,16 +67,16 @@ function FormParserFactory(grammar, source) {
 
       OneOf({forms, toString}) {
         const match = R.reduceWhile(
-          (previous) => previous.case === 'Error',
+          (previous) => previous.type === 'Error',
           (previous, form) => parseForm(form, pointer),
           {
-            case: 'Error'
+            type: 'Error'
           },
           forms
         )
-        if (match.case === 'Error') {
+        if (match.type === 'Error') {
           return {
-            case: 'Error',
+            type: 'Error',
             error: `expected ${toString()}`,
             pointer
           }
@@ -93,7 +93,7 @@ function FormParserFactory(grammar, source) {
         do {
           previous = next
           const result = parseForm(form,  previous.end)
-          if (result.case === 'Error') {
+          if (result.type === 'Error') {
             break
           }
           next = {
@@ -104,13 +104,13 @@ function FormParserFactory(grammar, source) {
         } while (true)
         if (previous.value.length === 0) {
           return {
-            case: 'Error',
+            type: 'Error',
             error: `expected ${toString()}`,
             pointer
           }
         }
         return {
-          case: 'Success',
+          type: 'Success',
           value: previous.value,
           start: previous.start,
           end: previous.end,
@@ -122,9 +122,9 @@ function FormParserFactory(grammar, source) {
 
       Optional({form}) {
         const result = parseForm(form,  pointer)
-        if (result.case === 'Error') {
+        if (result.type === 'Error') {
           return {
-            case: 'Success',
+            type: 'Success',
             value: '',
             start: pointer,
             end: pointer,
@@ -138,20 +138,20 @@ function FormParserFactory(grammar, source) {
 
       Ref({name}) {
         const result = parseForm(grammar[name], pointer)
-        if (result.case === 'Error') {
+        if (result.type === 'Error') {
           if (!result.ref) {
             result.ref = name
           }
           return result
         }
         const self = {
-          case: 'Success',
+          type: 'Success',
           ref: name,
           value: result.asValue(),
           start: result.start,
           end: result.end,
           asValue() {
-            return R.omit(['case', 'asValue'], self)
+            return R.omit(['type', 'asValue'], self)
           }
         }
         return self
@@ -172,13 +172,13 @@ module.exports = {
       }
       const result = parseForm(ref('Root'), pointer)
 
-      if (result.case === 'Error') {
+      if (result.type === 'Error') {
         return result
       }
 
       if (source.length > result.end.index) {
         return {
-          case: 'Error',
+          type: 'Error',
           ref: 'Root',
           error: 'unexpected source after Root',
           pointer: result.end
@@ -186,7 +186,7 @@ module.exports = {
       }
 
       const value = result.asValue()
-      value.case = 'Success'
+      value.type = 'Success'
       return value
     }
   },
