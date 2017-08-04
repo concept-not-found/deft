@@ -429,4 +429,22 @@ describe('parser factory', () => {
     })
   })
 
+  describe('circular references', () => {
+    it('should detect Root -> Root', () => {
+      const parser = ParserFactory({
+        Root: ref('Root')
+      })
+      expect(parser('')).toEqual({
+        type: 'Error',
+        ref: 'Root',
+        error: 'circular reference detected ["ref Root @ index 0"]',
+        pointer: {
+          index: 0,
+          line: 0,
+          column: 0
+        }
+      })
+    })
+  })
+
 })

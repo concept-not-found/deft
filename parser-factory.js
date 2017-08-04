@@ -4,6 +4,7 @@ const {GrammarFactory, oneOf, manyOf, optional, ref} = require('./grammar-factor
 const {count: countLines} = require('./lines')
 
 function FormParserFactory(grammar, source) {
+  const seenRefs = new Set()
   function parseForm(form, pointer) {
     return match({
       String({value, toString}) {
@@ -137,7 +138,17 @@ function FormParserFactory(grammar, source) {
       },
 
       Ref({name}) {
+        const currentRef = `ref ${name} @ index ${pointer.index}`
+        if (seenRefs.has(currentRef)) {
+          return {
+            type: 'Error',
+            error: `circular reference detected ${JSON.stringify([...seenRefs.values()])}`,
+            pointer
+          }
+        }
+        seenRefs.add(currentRef)
         const result = parseForm(grammar[name], pointer)
+        seenRefs.delete(currentRef)
         if (result.type === 'Error') {
           if (!result.ref) {
             result.ref = name
