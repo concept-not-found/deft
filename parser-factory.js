@@ -205,5 +205,17 @@ module.exports = {
   oneOf,
   manyOf,
   optional,
-  ref
+  ref,
+
+  separated(form, separator) {
+    return [
+      optional([
+        form,
+        optional(manyOf([
+          separator,
+          form
+        ]))
+      ])
+    ]
+  }
 }

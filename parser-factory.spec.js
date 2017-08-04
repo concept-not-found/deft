@@ -1,4 +1,4 @@
-const {ParserFactory, oneOf, manyOf, optional, ref} = require('./parser-factory')
+const {ParserFactory, oneOf, manyOf, optional, ref, separated} = require('./parser-factory')
 
 describe('parser factory', () => {
   describe('hotdog parser', () => {
@@ -496,6 +496,109 @@ describe('parser factory', () => {
           index: 0,
           line: 0,
           column: 0
+        }
+      })
+    })
+  })
+
+  describe('[1,2,3] parser', () => {
+    const parser = ParserFactory({
+      Root: ['[', separated(oneOf(1, 2, 3), ','), ']']
+    })
+    it('should parse []', () => {
+      expect(parser('[]')).toEqual({
+        type: 'Success',
+        ref: 'Root',
+        value: ['[', [''], ']'],
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 2,
+          line: 0,
+          column: 2
+        }
+      })
+    })
+
+    it('should parse [1]', () => {
+      expect(parser('[1]')).toEqual({
+        type: 'Success',
+        ref: 'Root',
+        value: ['[', [['1', '']], ']'],
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 3,
+          line: 0,
+          column: 3
+        }
+      })
+    })
+
+    it('should parse [1,2]', () => {
+      expect(parser('[1,2]')).toEqual({
+        type: 'Success',
+        ref: 'Root',
+        value: ['[', [['1', [[',', '2']]]], ']'],
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 5,
+          line: 0,
+          column: 5
+        }
+      })
+    })
+
+    it('should parse [1,2,3]', () => {
+      expect(parser('[1,2,3]')).toEqual({
+        type: 'Success',
+        ref: 'Root',
+        value: ['[', [['1', [[',', '2'], [',', '3']]]], ']'],
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 7,
+          line: 0,
+          column: 7
+        }
+      })
+    })
+
+    it('should fail to parse [,2]', () => {
+      expect(parser('[,2]')).toEqual({
+        type: 'Error',
+        ref: 'Root',
+        error: 'expected "]"',
+        pointer: {
+          index: 1,
+          line: 0,
+          column: 1
+        }
+      })
+    })
+
+    it('should fail to parse [1,]', () => {
+      expect(parser('[1,]')).toEqual({
+        type: 'Error',
+        ref: 'Root',
+        error: 'expected "]"',
+        pointer: {
+          index: 2,
+          line: 0,
+          column: 2
         }
       })
     })
