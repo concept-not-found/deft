@@ -509,7 +509,7 @@ describe('parser factory', () => {
       expect(parser('[]')).toEqual({
         type: 'Success',
         ref: 'Root',
-        value: ['[', [''], ']'],
+        value: ['[', ']'],
         start: {
           index: 0,
           line: 0,
@@ -527,7 +527,7 @@ describe('parser factory', () => {
       expect(parser('[1]')).toEqual({
         type: 'Success',
         ref: 'Root',
-        value: ['[', [['1', '']], ']'],
+        value: ['[', '1', ']'],
         start: {
           index: 0,
           line: 0,
@@ -545,7 +545,7 @@ describe('parser factory', () => {
       expect(parser('[1,2]')).toEqual({
         type: 'Success',
         ref: 'Root',
-        value: ['[', [['1', [[',', '2']]]], ']'],
+        value: ['[', '1', ',', '2', ']'],
         start: {
           index: 0,
           line: 0,
@@ -563,7 +563,7 @@ describe('parser factory', () => {
       expect(parser('[1,2,3]')).toEqual({
         type: 'Success',
         ref: 'Root',
-        value: ['[', [['1', [[',', '2'], [',', '3']]]], ']'],
+        value: ['[', '1', ',', '2', ',', '3', ']'],
         start: {
           index: 0,
           line: 0,

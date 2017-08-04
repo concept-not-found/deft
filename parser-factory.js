@@ -61,7 +61,9 @@ function FormParserFactory(grammar, source) {
           start: result.start,
           end: result.end,
           asValue() {
-            return result.value.map((val) => val.asValue())
+            return R.unnest(result.value
+              .map((val) => val.asValue())
+              .filter((val) => !R.isEmpty(val)))
           }
         }
       },
@@ -116,7 +118,9 @@ function FormParserFactory(grammar, source) {
           start: previous.start,
           end: previous.end,
           asValue() {
-            return previous.value.map((val) => val.asValue())
+            return R.unnest(previous.value
+              .map((val) => val.asValue())
+              .filter((val) => !R.isEmpty(val)))
           }
         }
       },
