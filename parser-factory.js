@@ -6,7 +6,7 @@ const {count: countLines} = require('./lines')
 function parse(grammar, form, source, pointer) {
   return match({
     String({value, toString}) {
-      if (!source.startsWith(value)) {
+      if (source.substr(pointer.index, value.length) !== value) {
         return {
           case: 'Error',
           error: `expected ${toString()}`,
@@ -34,8 +34,7 @@ function parse(grammar, form, source, pointer) {
       const result = R.reduceWhile(
         (previous) => previous.case !== 'Error',
         (previous, form) => {
-          const nextSource = R.drop(previous.end.index, source)
-          const result = parse(grammar, form, nextSource, previous.end)
+          const result = parse(grammar, form, source, previous.end)
           if (result.case === 'Error') {
             return result
           }
@@ -92,8 +91,7 @@ function parse(grammar, form, source, pointer) {
       }
       do {
         previous = next
-        const nextSource = R.drop(previous.end.index, source)
-        const result = parse(grammar, form, nextSource, previous.end)
+        const result = parse(grammar, form, source, previous.end)
         if (result.case === 'Error') {
           break
         }
@@ -174,8 +172,7 @@ module.exports = {
         return result
       }
 
-      const remainingSource = R.drop(result.end.index, source)
-      if (remainingSource) {
+      if (source.length > result.end.index) {
         return {
           case: 'Error',
           ref: 'Root',
