@@ -14,6 +14,9 @@ function normalize(form) {
 
   if (form instanceof Array) {
     const forms = form
+    if (forms.length === 1) {
+      return normalize(forms[0])
+    }
     const self = {
       type: 'Array',
       forms: forms.map(normalize),
