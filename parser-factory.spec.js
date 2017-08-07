@@ -258,6 +258,32 @@ describe('parser factory', () => {
         }
       })
     })
+
+    it('should fail to parse veryhotdog', () => {
+      expect(parser('veryhotdog')).toEqual({
+        type: 'Error',
+        ref: 'Root',
+        error: 'expected /hotdog/',
+        pointer: {
+          index: 0,
+          line: 0,
+          column: 0
+        }
+      })
+    })
+
+    it('should fail to parse hotdoghotdog', () => {
+      expect(parser('hotdoghotdog')).toEqual({
+        type: 'Error',
+        ref: 'Root',
+        error: 'unexpected source after Root',
+        pointer: {
+          index: 6,
+          line: 0,
+          column: 6
+        }
+      })
+    })
   })
 
   describe('star trek|war parser', () => {
