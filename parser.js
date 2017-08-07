@@ -1,11 +1,17 @@
-const {ParserFactory, oneOf, manyOf, optional, ref} = require('./parser-factory')
+const {ParserFactory, oneOf, manyOf, optional, ref, except} = require('./parser-factory')
+
+const reservedWords = [
+  'null',
+  'true',
+  'false'
+]
 
 module.exports = ParserFactory({
   Null: 'null',
 
   Boolean: oneOf('true', 'false'),
 
-  Identifier: /[$a-z_A-Z][$0-9a-z_A-Z]*/,
+  Identifier: except(/[$a-z_A-Z][$0-9a-z_A-Z]*/, reservedWords),
   // Number: [
   //   optional('-'),
   //   manyOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'),
@@ -80,10 +86,9 @@ module.exports = ParserFactory({
   // ],git 
 
   Expression: oneOf(
+    ref('Identifier'),
     ref('Null'),
-    ref('Boolean'),
-    ref('Identifier')
-    // ref('Number'),
+    ref('Boolean')
     // ref('String'),
     // ref('Array'),
     // ref('Object'),

@@ -1,26 +1,23 @@
+const R = require('ramda')
 const parser = require('./parser')
 
 function shouldParse(source, debug) {
   it(`should parse ${JSON.stringify(source)}`, () => {
+    const result = parser(source)
     if (debug) {
-      expect(parser(source)).toEqual({
-        type: 'Success'
-      })
-    } else {
-      expect(parser(source).type).toBe('Success')
+      console.log(JSON.stringify(result, null, 2)) // eslint-disable-line no-console
     }
+    expect(result.type).toBe('Success')
   })
 }
 
 function shouldError(source, debug) {
   it(`should error ${JSON.stringify(source)}`, () => {
+    const result = parser(source)
     if (debug) {
-      expect(parser(source)).toEqual({
-        type: 'Error'
-      })
-    } else {
-      expect(parser(source).type).toBe('Error')
+      console.log(JSON.stringify(result, null, 2)) // eslint-disable-line no-console
     }
+    expect(result.type).toBe('Error')
   })
 }
 
@@ -48,6 +45,20 @@ describe('parser', () => {
   describe('identifier', () => {
     shouldParse('foo')
     shouldError('0foo')
+
+    describe('reserved words', () => {
+      function shouldNotParseReserveredWord(reservedWord) {
+        it(`should not parse ${reservedWord} as an identifier`, () => {
+          const result = parser(reservedWord)
+          expect(result.type).toBe('Success')
+          expect(R.path(['value', 'value', 'ref'], result)).not.toBe('Identifier')
+        })
+      }
+
+      shouldNotParseReserveredWord('null')
+      shouldNotParseReserveredWord('true')
+      shouldNotParseReserveredWord('false')
+    })
   })
 
   describe('literal', () => {

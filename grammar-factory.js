@@ -145,7 +145,7 @@ module.exports = {
     return {
       type: 'Except',
       form,
-      exceptions
+      exceptions: R.flatten(exceptions)
     }
   }
 }
