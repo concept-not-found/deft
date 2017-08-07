@@ -223,6 +223,43 @@ describe('parser factory', () => {
     })
   })
 
+  describe('hotdog parser using regex', () => {
+    const parser = ParserFactory({
+      Root: /hotdog/
+    })
+
+    it('should parse exactly hotdog', () => {
+      expect(parser('hotdog')).toEqual({
+        type: 'Success',
+        ref: 'Root',
+        value: 'hotdog',
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 6,
+          line: 0,
+          column: 6
+        }
+      })
+    })
+
+    it('should fail to parse empty', () => {
+      expect(parser('')).toEqual({
+        type: 'Error',
+        ref: 'Root',
+        error: 'expected /hotdog/',
+        pointer: {
+          index: 0,
+          line: 0,
+          column: 0
+        }
+      })
+    })
+  })
+
   describe('star trek|war parser', () => {
     const parser = ParserFactory({
       Root: ['star', ' ', oneOf('trek', 'wars')]
