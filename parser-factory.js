@@ -61,9 +61,12 @@ function FormParserFactory(grammar, source) {
           start: result.start,
           end: result.end,
           asValue() {
-            return R.unnest(result.value
+            const unnested = R.unnest(result.value
               .map((val) => val.asValue())
               .filter((val) => !R.isEmpty(val)))
+            return unnested.length === 1
+              ? unnested[0]
+              : unnested
           }
         }
       },
@@ -145,9 +148,12 @@ function FormParserFactory(grammar, source) {
           start: previous.start,
           end: previous.end,
           asValue() {
-            return R.unnest(previous.value
+            const unnested = R.unnest(previous.value
               .map((val) => val.asValue())
               .filter((val) => !R.isEmpty(val)))
+            return unnested.length === 1
+              ? unnested[0]
+              : unnested
           }
         }
       },

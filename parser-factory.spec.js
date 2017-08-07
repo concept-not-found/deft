@@ -64,6 +64,43 @@ describe('parser factory', () => {
     })
   })
 
+  describe('hotdog parser with extra array', () => {
+    const parser = ParserFactory({
+      Root: ['hotdog']
+    })
+
+    it('should parse exactly hotdog', () => {
+      expect(parser('hotdog')).toEqual({
+        type: 'Success',
+        ref: 'Root',
+        value: 'hotdog',
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 6,
+          line: 0,
+          column: 6
+        }
+      })
+    })
+
+    it('should fail to parse empty', () => {
+      expect(parser('')).toEqual({
+        type: 'Error',
+        ref: 'Root',
+        error: 'expected "hotdog"',
+        pointer: {
+          index: 0,
+          line: 0,
+          column: 0
+        }
+      })
+    })
+  })
+
   describe('hot\\ndog parser', () => {
     const parser = ParserFactory({
       Root: 'hot\ndog'
@@ -350,7 +387,7 @@ describe('parser factory', () => {
       expect(parser('ㅋ')).toEqual({
         type: 'Success',
         ref: 'Root',
-        value: ['ㅋ'],
+        value: 'ㅋ',
         start: {
           index: 0,
           line: 0,
