@@ -24,6 +24,16 @@ function normalize(form) {
     return self
   }
 
+  if (form instanceof RegExp) {
+    return {
+      type: 'RegularExpression',
+      regex: form,
+      toString() {
+        return form.toString()
+      }
+    }
+  }
+
   return match({
     OneOf({forms}) {
       const self = {

@@ -5,6 +5,7 @@ module.exports = ParserFactory({
 
   Boolean: oneOf('true', 'false'),
 
+  Identifier: /[$a-z_A-Z][$0-9a-z_A-Z]*/,
   // Number: [
   //   optional('-'),
   //   manyOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'),
@@ -80,7 +81,8 @@ module.exports = ParserFactory({
 
   Expression: oneOf(
     ref('Null'),
-    ref('Boolean')
+    ref('Boolean'),
+    ref('Identifier')
     // ref('Number'),
     // ref('String'),
     // ref('Array'),

@@ -12,6 +12,18 @@ function shouldParse(source, debug) {
   })
 }
 
+function shouldError(source, debug) {
+  it(`should error ${JSON.stringify(source)}`, () => {
+    if (debug) {
+      expect(parser(source)).toEqual({
+        type: 'Error'
+      })
+    } else {
+      expect(parser(source).type).toBe('Error')
+    }
+  })
+}
+
 describe('parser', () => {
   shouldParse('')
   shouldParse(' ')
@@ -31,6 +43,11 @@ describe('parser', () => {
     shouldParse('\n null ')
     shouldParse('\n null \n')
     shouldParse('\n null\n ')
+  })
+
+  describe('identifier', () => {
+    shouldParse('foo')
+    shouldError('0foo')
   })
 
   describe('literal', () => {

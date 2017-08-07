@@ -68,6 +68,33 @@ function FormParserFactory(grammar, source) {
         }
       },
 
+      RegularExpression({regex, toString}) {
+        const match = source.substr(pointer.index).match(regex)
+        if (!match || match.index !== 0) {
+          return {
+            type: 'Error',
+            error: `expected ${toString()}`,
+            pointer
+          }
+        }
+        const [value] = match
+
+        const {newlineCount, lastLineLength} = countLines(value)
+        return {
+          type: 'Success',
+          value,
+          start: pointer,
+          end: {
+            index: pointer.index + value.length,
+            line: pointer.line + newlineCount,
+            column: pointer.column + lastLineLength
+          },
+          asValue() {
+            return value
+          }
+        }
+      },
+
       OneOf({forms, toString}) {
         const match = R.reduceWhile(
           (previous) => previous.type === 'Error',
