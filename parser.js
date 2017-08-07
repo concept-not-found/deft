@@ -1,4 +1,4 @@
-const {ParserFactory, oneOf, optional, ref} = require('./parser-factory')
+const {ParserFactory, oneOf, manyOf, optional, ref} = require('./parser-factory')
 
 module.exports = ParserFactory({
   Null: 'null',
@@ -32,13 +32,15 @@ module.exports = ParserFactory({
   //   ]
   // ),
 
-  // Whitespace: manyOf(
-  //   ' ',
-  //   '\t',
-  //   '\r\n',
-  //   '\r',
-  //   '\n'
-  // ),
+  Whitespace: oneOf(
+    '\t',
+    ' '
+  ),
+
+  LineTerminator: oneOf(
+    '\n',
+    '\r'
+  ),
 
   // Array: [
   //   '[',
@@ -90,5 +92,15 @@ module.exports = ParserFactory({
     // ]
   ),
 
-  Root: optional(ref('Expression'))
+  Root: [
+    optional(manyOf(oneOf(
+      ref('Whitespace'),
+      ref('LineTerminator')
+    ))),
+    optional(ref('Expression')),
+    optional(manyOf(oneOf(
+      ref('Whitespace'),
+      ref('LineTerminator')
+    )))
+  ]
 })

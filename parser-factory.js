@@ -95,7 +95,7 @@ function FormParserFactory(grammar, source) {
         }
         while (true) {
           previous = next
-          const result = parseForm(form,  previous.end)
+          const result = parseForm(form, previous.end)
           if (result.type === 'Error') {
             break
           }

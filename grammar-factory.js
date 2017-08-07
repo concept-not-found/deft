@@ -83,21 +83,30 @@ module.exports = {
     }
   },
 
-  manyOf(form) {
+  manyOf(form, extra) {
+    if (extra) {
+      throw new Error(`manyOf only takes a single argument. unexpected extra argument ${JSON.stringify(extra)}`)
+    }
     return {
       type: 'ManyOf',
       form
     }
   },
 
-  optional(form) {
+  optional(form, extra) {
+    if (extra) {
+      throw new Error(`optional only takes a single argument. unexpected extra argument ${JSON.stringify(extra)}`)
+    }
     return {
       type: 'Optional',
       form
     }
   },
 
-  ref(name) {
+  ref(name, extra) {
+    if (extra) {
+      throw new Error(`ref only takes a single argument. unexpected extra argument ${JSON.stringify(extra)}`)
+    }
     return {
       type: 'Ref',
       name
