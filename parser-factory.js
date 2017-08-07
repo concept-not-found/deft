@@ -1,6 +1,6 @@
 const R = require('ramda')
 const match = require('./match')
-const {GrammarFactory, oneOf, manyOf, optional, ref} = require('./grammar-factory')
+const {GrammarFactory, oneOf, manyOf, optional, ref, except} = require('./grammar-factory')
 const {count: countLines} = require('./lines')
 
 function FormParserFactory(grammar, source) {
@@ -203,6 +203,21 @@ function FormParserFactory(grammar, source) {
           }
         }
         return self
+      },
+
+      Except({form, exceptions, toString}) {
+        const result = parseForm(form, pointer)
+        if (result.type === 'Error') {
+          return result
+        }
+        if (exceptions.includes(result.value)) {
+          return {
+            type: 'Error',
+            error: `expected ${toString()}`,
+            pointer
+          }
+        }
+        return result
       }
     })(form)
   }
@@ -243,6 +258,7 @@ module.exports = {
   manyOf,
   optional,
   ref,
+  except,
 
   separated(form, separator) {
     return [

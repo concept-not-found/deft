@@ -1,4 +1,4 @@
-const {ParserFactory, oneOf, manyOf, optional, ref, separated} = require('./parser-factory')
+const {ParserFactory, oneOf, manyOf, optional, ref, except, separated} = require('./parser-factory')
 
 describe('parser factory', () => {
   describe('hotdog parser', () => {
@@ -592,6 +592,43 @@ describe('parser factory', () => {
         type: 'Error',
         ref: 'B',
         error: 'circular reference detected {ref("Root") @ 0, ref("A") @ 0, ref("B") @ 0}',
+        pointer: {
+          index: 0,
+          line: 0,
+          column: 0
+        }
+      })
+    })
+  })
+
+  describe('a two digit number, except 42 parser', () => {
+    const parser = ParserFactory({
+      Root: except(/[0-9]{2}/, 42)
+    })
+
+    it('should parse exactly 06', () => {
+      expect(parser('06')).toEqual({
+        type: 'Success',
+        ref: 'Root',
+        value: '06',
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 2,
+          line: 0,
+          column: 2
+        }
+      })
+    })
+
+    it('should fail to parse 42', () => {
+      expect(parser('42')).toEqual({
+        type: 'Error',
+        ref: 'Root',
+        error: 'expected except(/[0-9]{2}/, "42")',
         pointer: {
           index: 0,
           line: 0,

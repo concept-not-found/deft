@@ -3,13 +3,14 @@ const match = require('./match')
 
 function normalize(form) {
   if (typeof form === 'string' || typeof form === 'number' || typeof form === 'boolean') {
-    return {
+    const self = {
       type: 'String',
       value: String(form),
       toString() {
-        return JSON.stringify(form)
+        return JSON.stringify(self.value)
       }
     }
+    return self
   }
 
   if (form instanceof Array) {
@@ -28,13 +29,14 @@ function normalize(form) {
   }
 
   if (form instanceof RegExp) {
-    return {
+    const self = {
       type: 'RegularExpression',
       regex: form,
       toString() {
-        return form.toString()
+        return self.regex.toString()
       }
     }
+    return self
   }
 
   return match({
@@ -72,13 +74,26 @@ function normalize(form) {
     },
 
     Ref({name}) {
-      return {
+      const self = {
         type: 'Ref',
         name,
         toString() {
-          return `ref("${name}")`
+          return `ref("${self.name}")`
         }
       }
+      return self
+    },
+
+    Except({form, exceptions}) {
+      const self = {
+        type: 'Except',
+        form: normalize(form),
+        exceptions: exceptions.map(String),
+        toString() {
+          return `except(${self.form.toString()}, ${self.exceptions.map(JSON.stringify).join(', ')})`
+        }
+      }
+      return self
     }
   })(form)
 }
@@ -123,6 +138,14 @@ module.exports = {
     return {
       type: 'Ref',
       name
+    }
+  },
+
+  except(form, ...exceptions) {
+    return {
+      type: 'Except',
+      form,
+      exceptions
     }
   }
 }
