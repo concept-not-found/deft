@@ -158,6 +158,11 @@ module.exports = ParserFactory({
         ref('Expression'),
         ref('Whitespace'),
         ']'
+      ],
+      [
+        '.',
+        ref('Whitespace'),
+        ref('Identifier')
       ]
     ), ref('Whitespace'))
   ],
