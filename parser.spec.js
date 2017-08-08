@@ -20,6 +20,13 @@ function shouldError(source, debug) {
     expect(result.type).toBe('Error')
   })
 }
+function shouldNotParseReserveredWord(reservedWord) {
+  it(`should not parse ${reservedWord} as an identifier`, () => {
+    const result = parser(reservedWord)
+    expect(result.type).toBe('Success')
+    expect(R.path(['value', 'value', 'ref'], result)).not.toBe('Identifier')
+  })
+}
 
 describe('parser', () => {
   shouldParse('')
@@ -47,14 +54,6 @@ describe('parser', () => {
     shouldError('0foo')
 
     describe('reserved words', () => {
-      function shouldNotParseReserveredWord(reservedWord) {
-        it(`should not parse ${reservedWord} as an identifier`, () => {
-          const result = parser(reservedWord)
-          expect(result.type).toBe('Success')
-          expect(R.path(['value', 'value', 'ref'], result)).not.toBe('Identifier')
-        })
-      }
-
       shouldNotParseReserveredWord('null')
       shouldNotParseReserveredWord('true')
       shouldNotParseReserveredWord('false')
