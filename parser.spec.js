@@ -166,6 +166,7 @@ describe('parser', () => {
     shouldError(')=>a')
     shouldError('(x=>a')
     shouldError('x)=>a')
+    shouldError('((x))=>a')
     shouldError('(x => y) => a')
   })
 })
