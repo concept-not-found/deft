@@ -79,7 +79,7 @@ describe('parser', () => {
     shouldParse('\'\'')
     shouldParse('""')
     shouldParse('"hotdog"')
-    shouldParse('"hot\ndog"')
+    shouldParse('"hot\\ndog"')
     shouldParse('"hot\\xA9dog"')
     shouldParse('"hot\\u00A9dog"')
     shouldParse('"hot\\u{1D306}dog"')
@@ -88,6 +88,7 @@ describe('parser', () => {
     shouldError('hotdog"')
     shouldError('""hotdog"')
     shouldError('"hotdog""')
+    shouldError('"hot\ndog"')
 
     shouldParse('[]')
     shouldParse('[ ]')

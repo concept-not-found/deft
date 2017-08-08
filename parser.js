@@ -24,7 +24,7 @@ module.exports = ParserFactory({
     [
       '"',
       optional(manyOf(
-        /[^"\\]/,
+        /[^"\\\b\f\n\r\t\v\0]/,
         '\\\'',
         '\\"',
         '\\\\',
@@ -44,7 +44,7 @@ module.exports = ParserFactory({
     [
       '\'',
       optional(manyOf(
-        /[^'\\]/,
+        /[^'\\\b\f\n\r\t\v\0]/,
         '\\\'',
         '\\"',
         '\\\\',
