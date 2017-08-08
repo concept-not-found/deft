@@ -1,4 +1,4 @@
-const {ParserFactory, oneOf, manyOf, optional, ref, except} = require('./parser-factory')
+const {ParserFactory, oneOf, manyOf, optional, ref, except, separated} = require('./parser-factory')
 
 const reservedWords = [
   'null',
@@ -73,19 +73,19 @@ module.exports = ParserFactory({
     '\r'
   ),
 
-  // Array: [
-  //   '[',
-  //   optional(
-  //     optional(ref('Whitespace')),
-  //     separated(ref('Expression'), [
-  //       optional(ref('Whitespace')),
-  //       ',',
-  //       optional(ref('Whitespace'))
-  //     ]),
-  //     optional(ref('Whitespace'))
-  //   ),
-  //   ']'
-  // ],
+  Array: [
+    '[',
+    optional(
+      optional(ref('Whitespace')),
+      separated(ref('Expression'), [
+        optional(ref('Whitespace')),
+        ',',
+        optional(ref('Whitespace'))
+      ]),
+      optional(ref('Whitespace'))
+    ),
+    ']'
+  ],
 
   // Object: [
   //   '{',
@@ -114,8 +114,8 @@ module.exports = ParserFactory({
     ref('Null'),
     ref('Boolean'),
     ref('Numeric'),
-    ref('String')
-    // ref('Array'),
+    ref('String'),
+    ref('Array')
     // ref('Object'),
     // [
     //   '(',
@@ -125,10 +125,10 @@ module.exports = ParserFactory({
   ),
 
   Root: [
-    optional(manyOf(oneOf(
+    optional(manyOf(
       ref('Whitespace'),
       ref('LineTerminator')
-    ))),
+    )),
     optional(ref('Expression')),
     optional(manyOf(
       ref('Whitespace'),

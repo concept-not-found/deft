@@ -124,10 +124,10 @@ module.exports = {
     }
   },
 
-  optional(form, extra) {
-    if (extra) {
-      throw new Error(`optional only takes a single argument. unexpected extra argument ${JSON.stringify(extra)}`)
-    }
+  optional(...forms) {
+    const form = forms.length > 1
+      ? [forms]
+      : forms[0]
     return {
       type: 'Optional',
       form
