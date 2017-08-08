@@ -65,10 +65,7 @@ module.exports = ParserFactory({
 
   Whitespace: oneOf(
     '\t',
-    ' '
-  ),
-
-  LineTerminator: oneOf(
+    ' ',
     '\n',
     '\r'
   ),
@@ -87,27 +84,29 @@ module.exports = ParserFactory({
     ']'
   ],
 
-  // Object: [
-  //   '{',
-  //   optional(
-  //     optional(ref('Whitespace')),
-  //     separated(ref('Property'), [
-  //       optional(ref('Whitespace')),
-  //       ',',
-  //       optional(ref('Whitespace'))
-  //     ]),
-  //     optional(ref('Whitespace'))
-  //   ),
-  //   '}'
-  // ],
-
-  // Property: [
-  //   ref('String'),
-  //   optional(ref('Whitespace')),
-  //   ':',
-  //   optional(ref('Whitespace')),
-  //   ref('Expression')
-  // ],git 
+  Object: [
+    '{',
+    optional(
+      optional(ref('Whitespace')),
+      separated([
+        oneOf(
+          ref('Identifier'),
+          ref('String'),
+          ref('Numeric')
+        ),
+        optional(ref('Whitespace')),
+        ':',
+        optional(ref('Whitespace')),
+        ref('Expression')
+      ], [
+        optional(ref('Whitespace')),
+        ',',
+        optional(ref('Whitespace'))
+      ]),
+      optional(ref('Whitespace'))
+    ),
+    '}'
+  ],
 
   Expression: oneOf(
     ref('Identifier'),
@@ -115,8 +114,8 @@ module.exports = ParserFactory({
     ref('Boolean'),
     ref('Numeric'),
     ref('String'),
-    ref('Array')
-    // ref('Object'),
+    ref('Array'),
+    ref('Object')
     // [
     //   '(',
     //   ref('Expression'),
@@ -125,14 +124,8 @@ module.exports = ParserFactory({
   ),
 
   Root: [
-    optional(manyOf(
-      ref('Whitespace'),
-      ref('LineTerminator')
-    )),
+    optional(manyOf(ref('Whitespace'))),
     optional(ref('Expression')),
-    optional(manyOf(
-      ref('Whitespace'),
-      ref('LineTerminator')
-    ))
+    optional(manyOf(ref('Whitespace')))
   ]
 })
