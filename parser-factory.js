@@ -262,13 +262,11 @@ module.exports = {
 
   separated(form, separator) {
     return [
-      optional([
-        form,
-        optional(manyOf([
-          separator,
-          form
-        ]))
-      ])
+      form,
+      optional(manyOf([
+        separator,
+        form
+      ]))
     ]
   }
 }

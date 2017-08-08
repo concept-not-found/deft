@@ -73,39 +73,35 @@ module.exports = ParserFactory({
 
   Array: [
     '[',
-    optional(
+    optional(ref('Whitespace')),
+    optional(separated(ref('Expression'), [
       optional(ref('Whitespace')),
-      separated(ref('Expression'), [
-        optional(ref('Whitespace')),
-        ',',
-        optional(ref('Whitespace'))
-      ]),
+      ',',
       optional(ref('Whitespace'))
-    ),
+    ])),
+    optional(ref('Whitespace')),
     ']'
   ],
 
   Object: [
     '{',
-    optional(
+    optional(ref('Whitespace')),
+    optional(separated([
+      oneOf(
+        ref('Identifier'),
+        ref('String'),
+        ref('Numeric')
+      ),
       optional(ref('Whitespace')),
-      separated([
-        oneOf(
-          ref('Identifier'),
-          ref('String'),
-          ref('Numeric')
-        ),
-        optional(ref('Whitespace')),
-        ':',
-        optional(ref('Whitespace')),
-        ref('Expression')
-      ], [
-        optional(ref('Whitespace')),
-        ',',
-        optional(ref('Whitespace'))
-      ]),
+      ':',
+      optional(ref('Whitespace')),
+      ref('Expression')
+    ], [
+      optional(ref('Whitespace')),
+      ',',
       optional(ref('Whitespace'))
-    ),
+    ])),
+    optional(ref('Whitespace')),
     '}'
   ],
 
@@ -114,15 +110,13 @@ module.exports = ParserFactory({
       ref('Identifier'),
       [
         '(',
-        optional(
+        optional(ref('Whitespace')),
+        separated(ref('Identifier'), [
           optional(ref('Whitespace')),
-          separated(ref('Identifier'), [
-            optional(ref('Whitespace')),
-            ',',
-            optional(ref('Whitespace'))
-          ]),
+          ',',
           optional(ref('Whitespace'))
-        ),
+        ]),
+        optional(ref('Whitespace')),
         ')'
       ]
     ),
@@ -132,8 +126,42 @@ module.exports = ParserFactory({
     ref('Expression')
   ],
 
+  Call: [
+    oneOf(
+      ref('ArrowFunction'),
+      ref('Call'),
+      ref('Identifier'),
+      ref('Null'),
+      ref('Boolean'),
+      ref('Numeric'),
+      ref('String'),
+      ref('Array'),
+      ref('Object'),
+      [
+        '(',
+        optional(ref('Whitespace')),
+        ref('Expression'),
+        optional(ref('Whitespace')),
+        ')'
+      ]
+    ),
+    manyOf([
+      optional(ref('Whitespace')),
+      '(',
+      optional(ref('Whitespace')),
+      separated(ref('Expression'), [
+        optional(ref('Whitespace')),
+        ',',
+        optional(ref('Whitespace'))
+      ]),
+      optional(ref('Whitespace')),
+      ')'
+    ])
+  ],
+
   Expression: oneOf(
     ref('ArrowFunction'),
+    ref('Call'),
     ref('Identifier'),
     ref('Null'),
     ref('Boolean'),
@@ -143,7 +171,9 @@ module.exports = ParserFactory({
     ref('Object'),
     [
       '(',
+      optional(ref('Whitespace')),
       ref('Expression'),
+      optional(ref('Whitespace')),
       ')'
     ]
   ),

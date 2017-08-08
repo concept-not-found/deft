@@ -4,7 +4,7 @@
   "description": "Safe subset of JavaScript",
   "main": "index.js",
   "scripts": {
-    "single": "jest",
+    "single": "jest --verbose",
     "test": "jest --coverage --verbose && npm run lint",
     "lint": "eslint --fix ."
   },

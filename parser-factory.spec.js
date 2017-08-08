@@ -640,7 +640,11 @@ describe('parser factory', () => {
 
   describe('[1,2,3] parser', () => {
     const parser = ParserFactory({
-      Root: ['[', separated(oneOf(1, 2, 3), ','), ']']
+      Root: [
+        '[',
+        optional(separated(oneOf(1, 2, 3), ',')),
+        ']'
+      ]
     })
     it('should parse []', () => {
       expect(parser('[]')).toEqual({
