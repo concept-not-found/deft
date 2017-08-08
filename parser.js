@@ -3,7 +3,8 @@ const {ParserFactory, oneOf, manyOf, optional, ref, except, separated} = require
 const reservedWords = [
   'null',
   'true',
-  'false'
+  'false',
+  'typeof'
 ]
 
 module.exports = ParserFactory({
@@ -11,7 +12,7 @@ module.exports = ParserFactory({
 
   Boolean: oneOf('true', 'false'),
 
-  Identifier: except(/[$a-z_A-Z][$0-9a-z_A-Z]*/, reservedWords),
+  Identifier: except(/[^ !"#%&'()*+,-./0-9:;<=>?@[\\\]^`{|}~][^ !"#%&'()*+,-./:;<=>?@[\\\]^`{|}~]*/, reservedWords),
 
   Numeric: oneOf(
     /0(b|B)[01]+/,

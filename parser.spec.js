@@ -20,9 +20,12 @@ function shouldError(source, debug) {
     expect(result.type).toBe('Error')
   })
 }
-function shouldNotParseReserveredWord(reservedWord) {
+function shouldNotParseReserveredWord(reservedWord, debug) {
   it(`should not parse ${reservedWord} as an identifier`, () => {
     const result = parser(reservedWord)
+    if (debug) {
+      console.log(JSON.stringify(result, null, 2)) // eslint-disable-line no-console
+    }
     expect(result.type).toBe('Success')
     expect(R.path(['value', 'value', 'ref'], result)).not.toBe('Identifier')
   })
