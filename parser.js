@@ -108,7 +108,31 @@ module.exports = ParserFactory({
     '}'
   ],
 
+  ArrowFunction: [
+    oneOf(
+      ref('Identifier'),
+      [
+        '(',
+        optional(
+          optional(ref('Whitespace')),
+          separated(ref('Identifier'), [
+            optional(ref('Whitespace')),
+            ',',
+            optional(ref('Whitespace'))
+          ]),
+          optional(ref('Whitespace'))
+        ),
+        ')'
+      ]
+    ),
+    optional(ref('Whitespace')),
+    '=>',
+    optional(ref('Whitespace')),
+    ref('Expression')
+  ],
+
   Expression: oneOf(
+    ref('ArrowFunction'),
     ref('Identifier'),
     ref('Null'),
     ref('Boolean'),
