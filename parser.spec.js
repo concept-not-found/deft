@@ -63,14 +63,30 @@ describe('parser', () => {
 
   describe('literal', () => {
     shouldParse('null')
+
     shouldParse('true')
     shouldParse('false')
+
     shouldParse('0')
     shouldParse('10')
+
     shouldParse('10e0')
     shouldParse('10e10')
+
     shouldParse('0b1010')
     shouldParse('0o1010')
     shouldParse('0x1010')
+
+    shouldParse('""')
+    shouldParse('\'\'')
+    shouldParse('"hotdog"')
+    shouldParse('\'hotdog\'')
+    shouldParse('\'hot\ndog\'')
+    shouldParse('\'hot\\xA9dog\'')
+    shouldParse('\'hot\\u00A9dog\'')
+    shouldParse('\'hot\\u{1D306}dog\'')
+    shouldError('\'hotdog')
+    shouldError('\'hotdog\'\'')
+
   })
 })

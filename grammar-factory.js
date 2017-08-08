@@ -111,10 +111,13 @@ module.exports = {
     }
   },
 
-  manyOf(form, extra) {
-    if (extra) {
-      throw new Error(`manyOf only takes a single argument. unexpected extra argument ${JSON.stringify(extra)}`)
-    }
+  manyOf(...forms) {
+    const form = forms.length > 1
+      ? {
+        type: 'OneOf',
+        forms
+      }
+      : forms[0]
     return {
       type: 'ManyOf',
       form

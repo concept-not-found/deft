@@ -20,18 +20,46 @@ module.exports = ParserFactory({
     /(0|([1-9][0-9]*))\.?((e|E)(\+|-)?[0-9]+)?/
   ),
 
-  // String: oneOf(
-  //   [
-  //     '"',
-  //     /a-zA-Z/,
-  //     '"',
-  //   ],
-  //   [
-  //     '\'',
-  //     /a-zA-Z/,
-  //     '\''
-  //   ]
-  // ),
+  String: oneOf(
+    [
+      '"',
+      optional(manyOf(
+        /[^"\\]/,
+        '\\\'',
+        '\\"',
+        '\\b',
+        '\\f',
+        '\\n',
+        '\\r',
+        '\\t',
+        '\\v',
+        '\\0',
+        /\\x[0-9a-fA-F]{2}/,
+        /\\u[0-9a-fA-F]{4}/,
+        /\\u\{[0-9a-fA-F]{1,6}\}/
+      )),
+      '"',
+    ],
+    [
+      '\'',
+      optional(manyOf(
+        /[^'\\]/,
+        '\\\'',
+        '\\"',
+        '\\b',
+        '\\f',
+        '\\n',
+        '\\r',
+        '\\t',
+        '\\v',
+        '\\0',
+        /\\x[0-9a-fA-F]{2}/,
+        /\\u[0-9a-fA-F]{4}/,
+        /\\u\{[0-9a-fA-F]{1,6}\}/
+      )),
+      '\'',
+    ]
+  ),
 
   Whitespace: oneOf(
     '\t',
@@ -83,8 +111,8 @@ module.exports = ParserFactory({
     ref('Identifier'),
     ref('Null'),
     ref('Boolean'),
-    ref('Numeric')
-    // ref('String'),
+    ref('Numeric'),
+    ref('String')
     // ref('Array'),
     // ref('Object'),
     // [
@@ -100,9 +128,9 @@ module.exports = ParserFactory({
       ref('LineTerminator')
     ))),
     optional(ref('Expression')),
-    optional(manyOf(oneOf(
+    optional(manyOf(
       ref('Whitespace'),
       ref('LineTerminator')
-    )))
+    ))
   ]
 })
