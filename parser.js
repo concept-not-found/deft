@@ -12,19 +12,13 @@ module.exports = ParserFactory({
   Boolean: oneOf('true', 'false'),
 
   Identifier: except(/[$a-z_A-Z][$0-9a-z_A-Z]*/, reservedWords),
-  // Number: [
-  //   optional('-'),
-  //   manyOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'),
-  //   optional([
-  //     '.',
-  //     manyOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
-  //   ]),
-  //   optional([
-  //     oneOf('e', 'E'),
-  //     oneOf('-', '+'),
-  //     manyOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
-  //   ])
-  // ],
+
+  Numeric: oneOf(
+    /0(b|B)[01]+/,
+    /0(o|O)[0-7]+/,
+    /0(x|X)[0-9a-fA-F]+/,
+    /(0|([1-9][0-9]*))\.?((e|E)(\+|-)?[0-9]+)?/
+  ),
 
   // String: oneOf(
   //   [
@@ -88,7 +82,8 @@ module.exports = ParserFactory({
   Expression: oneOf(
     ref('Identifier'),
     ref('Null'),
-    ref('Boolean')
+    ref('Boolean'),
+    ref('Numeric')
     // ref('String'),
     // ref('Array'),
     // ref('Object'),
