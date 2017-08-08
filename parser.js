@@ -139,12 +139,12 @@ module.exports = ParserFactory({
     ref('Numeric'),
     ref('String'),
     ref('Array'),
-    ref('Object')
-    // [
-    //   '(',
-    //   ref('Expression'),
-    //   ')'
-    // ]
+    ref('Object'),
+    [
+      '(',
+      ref('Expression'),
+      ')'
+    ]
   ),
 
   Root: [
