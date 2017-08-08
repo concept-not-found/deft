@@ -191,6 +191,7 @@ describe('parser', () => {
     shouldParse('x(y(z))')
 
     shouldParse('x(y)(z)')
+    shouldParse('x(y) (z)')
     shouldParse('(x)(y)(z)')
     shouldParse('((x))(y)(z)')
     shouldParse('(x)((y))(z)')

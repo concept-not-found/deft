@@ -224,7 +224,7 @@ function FormParserFactory(grammar, source) {
   return parseForm
 }
 
-module.exports = {
+const self = {
   ParserFactory(grammar) {
     return (source) => {
       const parseForm = FormParserFactory(GrammarFactory(grammar), source)
@@ -260,13 +260,24 @@ module.exports = {
   ref,
   except,
 
+  zeroOrMoreOf(...forms) {
+    return optional(manyOf(oneOf(...forms)))
+  },
+  zeroOrMoreOfAll(...forms) {
+    return optional(manyOf(forms))
+  },
+  manyOfAll(...forms) {
+    return manyOf(forms)
+  },
   separated(form, separator) {
     return [
       form,
-      optional(manyOf([
+      self.zeroOrMoreOfAll(
         separator,
         form
-      ]))
+      )
     ]
   }
 }
+
+module.exports = self

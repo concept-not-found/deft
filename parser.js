@@ -1,4 +1,4 @@
-const {ParserFactory, oneOf, manyOf, optional, ref, except, separated} = require('./parser-factory')
+const {ParserFactory, oneOf, optional, ref, except, separated, zeroOrMoreOf} = require('./parser-factory')
 
 const reservedWords = [
   'null',
@@ -24,7 +24,7 @@ module.exports = ParserFactory({
   String: oneOf(
     [
       '"',
-      optional(manyOf(
+      zeroOrMoreOf(
         /[^"\\\b\f\n\r\t\v\0]/,
         '\\\'',
         '\\"',
@@ -39,12 +39,12 @@ module.exports = ParserFactory({
         /\\x[0-9a-fA-F]{2}/,
         /\\u[0-9a-fA-F]{4}/,
         /\\u\{[0-9a-fA-F]{1,6}\}/
-      )),
+      ),
       '"',
     ],
     [
       '\'',
-      optional(manyOf(
+      zeroOrMoreOf(
         /[^'\\\b\f\n\r\t\v\0]/,
         '\\\'',
         '\\"',
@@ -59,49 +59,44 @@ module.exports = ParserFactory({
         /\\x[0-9a-fA-F]{2}/,
         /\\u[0-9a-fA-F]{4}/,
         /\\u\{[0-9a-fA-F]{1,6}\}/
-      )),
+      ),
       '\'',
     ]
   ),
 
-  Whitespace: oneOf(
-    '\t',
-    ' ',
-    '\n',
-    '\r'
-  ),
+  Whitespace: /[\n\r\t ]*/,
 
   Array: [
     '[',
-    optional(ref('Whitespace')),
+    ref('Whitespace'),
     optional(separated(ref('Expression'), [
-      optional(ref('Whitespace')),
+      ref('Whitespace'),
       ',',
-      optional(ref('Whitespace'))
+      ref('Whitespace')
     ])),
-    optional(ref('Whitespace')),
+    ref('Whitespace'),
     ']'
   ],
 
   Object: [
     '{',
-    optional(ref('Whitespace')),
+    ref('Whitespace'),
     optional(separated([
       oneOf(
         ref('Identifier'),
         ref('String'),
         ref('Numeric')
       ),
-      optional(ref('Whitespace')),
+      ref('Whitespace'),
       ':',
-      optional(ref('Whitespace')),
+      ref('Whitespace'),
       ref('Expression')
     ], [
-      optional(ref('Whitespace')),
+      ref('Whitespace'),
       ',',
-      optional(ref('Whitespace'))
+      ref('Whitespace')
     ])),
-    optional(ref('Whitespace')),
+    ref('Whitespace'),
     '}'
   ],
 
@@ -110,19 +105,19 @@ module.exports = ParserFactory({
       ref('Identifier'),
       [
         '(',
-        optional(ref('Whitespace')),
+        ref('Whitespace'),
         separated(ref('Identifier'), [
-          optional(ref('Whitespace')),
+          ref('Whitespace'),
           ',',
-          optional(ref('Whitespace'))
+          ref('Whitespace')
         ]),
-        optional(ref('Whitespace')),
+        ref('Whitespace'),
         ')'
       ]
     ),
-    optional(ref('Whitespace')),
+    ref('Whitespace'),
     '=>',
-    optional(ref('Whitespace')),
+    ref('Whitespace'),
     ref('Expression')
   ],
 
@@ -139,24 +134,24 @@ module.exports = ParserFactory({
       ref('Object'),
       [
         '(',
-        optional(ref('Whitespace')),
+        ref('Whitespace'),
         ref('Expression'),
-        optional(ref('Whitespace')),
+        ref('Whitespace'),
         ')'
       ]
     ),
-    manyOf([
-      optional(ref('Whitespace')),
+    ref('Whitespace'),
+    separated([
       '(',
-      optional(ref('Whitespace')),
+      ref('Whitespace'),
       separated(ref('Expression'), [
-        optional(ref('Whitespace')),
+        ref('Whitespace'),
         ',',
-        optional(ref('Whitespace'))
+        ref('Whitespace')
       ]),
-      optional(ref('Whitespace')),
+      ref('Whitespace'),
       ')'
-    ])
+    ], ref('Whitespace'))
   ],
 
   Expression: oneOf(
@@ -171,16 +166,16 @@ module.exports = ParserFactory({
     ref('Object'),
     [
       '(',
-      optional(ref('Whitespace')),
+      ref('Whitespace'),
       ref('Expression'),
-      optional(ref('Whitespace')),
+      ref('Whitespace'),
       ')'
     ]
   ),
 
   Root: [
-    optional(manyOf(ref('Whitespace'))),
+    ref('Whitespace'),
     optional(ref('Expression')),
-    optional(manyOf(ref('Whitespace')))
+    ref('Whitespace')
   ]
 })
