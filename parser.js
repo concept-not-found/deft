@@ -121,7 +121,7 @@ module.exports = ParserFactory({
     ref('Expression')
   ],
 
-  ExpressionWithPostfix: [
+  Expression: [
     oneOf(
       ref('ArrowFunction'),
       ref('Identifier'),
@@ -140,7 +140,7 @@ module.exports = ParserFactory({
       ]
     ),
     ref('Whitespace'),
-    separated(oneOf(
+    optional(separated(oneOf(
       [
         '(',
         ref('Whitespace'),
@@ -164,27 +164,8 @@ module.exports = ParserFactory({
         ref('Whitespace'),
         ref('Identifier')
       ]
-    ), ref('Whitespace'))
+    ), ref('Whitespace')))
   ],
-
-  Expression: oneOf(
-    ref('ArrowFunction'),
-    ref('ExpressionWithPostfix'),
-    ref('Identifier'),
-    ref('Null'),
-    ref('Boolean'),
-    ref('Numeric'),
-    ref('String'),
-    ref('Array'),
-    ref('Object'),
-    [
-      '(',
-      ref('Whitespace'),
-      ref('Expression'),
-      ref('Whitespace'),
-      ')'
-    ]
-  ),
 
   Root: [
     ref('Whitespace'),
