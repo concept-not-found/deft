@@ -136,6 +136,17 @@ module.exports = ParserFactory({
   ],
 
   Expression: [
+    zeroOrMoreOf(
+      [
+        'typeof',
+        /[\n\r\t ]+/
+      ],
+      '-',
+      '+',
+      '~',
+      '!'
+    ),
+    ref('Whitespace'),
     oneOf(
       ref('ArrowFunction'),
       ref('Identifier'),
@@ -156,6 +167,32 @@ module.exports = ParserFactory({
     ),
     ref('Whitespace'),
     optional(separated(oneOf(
+      [
+        oneOf(
+          '||',
+          '&&',
+          '|',
+          '^',
+          '&',
+          '!==',
+          '===',
+          '>>>',
+          '>>',
+          '>=',
+          '>',
+          '<<',
+          '<=',
+          '<',
+          '-',
+          '+',
+          '**',
+          '%',
+          '/',
+          '*'
+        ),
+        ref('Whitespace'),
+        ref('Expression')
+      ],
       [
         '(',
         ref('Whitespace'),
