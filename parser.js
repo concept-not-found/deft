@@ -121,6 +121,20 @@ module.exports = ParserFactory({
     ref('Expression')
   ],
 
+  Block: [
+    '{',
+    ref('Whitespace'),
+    separated([
+      ref('Identifier'),
+      ref('Whitespace'),
+      '=',
+      ref('Whitespace'),
+      ref('Expression'),
+    ], ref('Whitespace')),
+    ref('Expression'),
+    '}'
+  ],
+
   Expression: [
     oneOf(
       ref('ArrowFunction'),
@@ -131,6 +145,7 @@ module.exports = ParserFactory({
       ref('String'),
       ref('Array'),
       ref('Object'),
+      ref('Block'),
       [
         '(',
         ref('Whitespace'),
