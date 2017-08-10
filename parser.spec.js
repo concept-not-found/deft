@@ -74,12 +74,12 @@ describe('parser', () => {
     describe('numberic', () => {
       shouldParse('0')
       shouldParse('10')
-      // shouldParse('.0')
+      shouldParse('.0')
 
       shouldParse('10e0')
       shouldParse('10e10')
-      // shouldParse('1.0e10')
-      // shouldParse('.0e10')
+      shouldParse('1.0e10')
+      shouldParse('.0e10')
 
       shouldParse('0b1010')
       shouldParse('0o1010')
@@ -315,7 +315,7 @@ describe('parser', () => {
     shouldParse('x * x')
     shouldParse('x + [3]')
     shouldParse('x + (3)')
-    // shouldParse('x + .3')
+    shouldParse('x + .3')
     shouldParse('x + x * x')
     shouldParse('(x + x) * x')
     shouldParse('x + (x * x)')
