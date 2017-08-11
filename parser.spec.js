@@ -20,6 +20,7 @@ function shouldError(source, debug) {
     expect(result.type).toBe('Error')
   })
 }
+
 function shouldNotParseReserveredWord(reservedWord, debug) {
   it(`should not parse ${reservedWord} as an identifier`, () => {
     const result = parser(reservedWord)
@@ -29,6 +30,10 @@ function shouldNotParseReserveredWord(reservedWord, debug) {
     expect(result.type).toBe('Success')
     expect(R.path(['value', 'value', 'ref'], result)).not.toBe('Identifier')
   })
+}
+
+function mergeSpaces([singleString]) {
+  return singleString.replace(/[\n\r\t ]+/g, ' ')
 }
 
 describe('parser', () => {
@@ -54,7 +59,10 @@ describe('parser', () => {
 
   describe('identifier', () => {
     shouldParse('foo')
+
     shouldError('0foo')
+    shouldError('1 x()')
+    shouldError('x = 1 x()')
 
     describe('reserved words', () => {
       shouldNotParseReserveredWord('null')
@@ -173,6 +181,7 @@ describe('parser', () => {
   })
 
   describe('call', () => {
+    shouldParse('x()')
     shouldParse('x(y)')
     shouldParse('x (y)')
     shouldParse('x( y)')
@@ -203,6 +212,10 @@ describe('parser', () => {
     shouldParse('(x)((y)(z))')
     shouldParse('((x)(y)(z))')
     shouldParse('(x => y)(x)')
+
+    shouldError('x(')
+    shouldError('x)')
+    shouldError('x(())')
   })
 
   describe('object accessor', () => {
@@ -260,11 +273,14 @@ describe('parser', () => {
   describe('block', () => {
     shouldParse('{x=1 x}')
     shouldParse('{ x=1 x}')
+    shouldParse('{x=1 x}')
     shouldParse('{x=1 x }')
     shouldParse('{ x=1 x }')
     shouldParse('{x =1 x}')
     shouldParse('{x= 1 x}')
     shouldParse('{x = 1 x}')
+    shouldParse('{x = 1 x()}')
+    shouldParse('{x = 1 x() }')
     shouldParse('{x = 1 y = 1 add(x, y)}')
     shouldParse('{x = 1 {y = 1 add(x, y)}}')
     shouldParse('{x = 1 {y: x}}')
@@ -330,5 +346,21 @@ describe('parser', () => {
     shouldError('x != x')
     shouldError('x!+x')
     shouldError('x!x')
+  })
+
+  describe('programs', () => {
+    shouldParse(mergeSpaces`
+      {
+        sumMatrix = width => {
+          buildMatrix = width => {
+            buildRow = i => R.range(0, width).map(x => x + i)
+            R.range(0, width).map(buildRow)
+          }
+          sumMatrix = mat => R.sum(mat.reduce(R.concat, []))
+          sumMatrix(buildMatrix(width))
+        }
+        sumMatrix(800)
+      }
+    `)
   })
 })

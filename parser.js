@@ -133,7 +133,9 @@ module.exports = ParserFactory({
       ref('Whitespace'),
       ref('Expression'),
     ], ref('Whitespace')),
+    ref('Whitespace'),
     ref('Expression'),
+    ref('Whitespace'),
     '}'
   ],
 
@@ -198,11 +200,11 @@ module.exports = ParserFactory({
       [
         '(',
         ref('Whitespace'),
-        separated(ref('Expression'), [
+        optional(separated(ref('Expression'), [
           ref('Whitespace'),
           ',',
           ref('Whitespace')
-        ]),
+        ])),
         ref('Whitespace'),
         ')'
       ],
