@@ -350,16 +350,13 @@ describe('parser', () => {
 
   describe('programs', () => {
     shouldParse(mergeSpaces`
-      {
-        sumMatrix = width => {
-          buildMatrix = width => {
-            buildRow = i => R.range(0, width).map(x => x + i)
-            R.range(0, width).map(buildRow)
-          }
-          sumMatrix = mat => R.sum(mat.reduce(R.concat, []))
-          sumMatrix(buildMatrix(width))
+      width => {
+        buildMatrix = width => {
+          buildRow = i => R.range(0, width).map(x => x + i)
+          R.range(0, width).map(buildRow)
         }
-        sumMatrix(800)
+        sumMatrix = mat => R.sum(mat.reduce(R.concat, []))
+        sumMatrix(buildMatrix(width))
       }
     `)
   })
