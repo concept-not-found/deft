@@ -372,5 +372,10 @@ describe('parser', () => {
       size => R.range(0, 256).reduce((list, i) =>
         list.map(x => x + 1), R.range(0, size))
     `)
+
+    shouldParse(mergeSpaces`
+      size => R.sum(R.range(0, size).reduce((list, i) =>
+        R.reverse(list), R.range(0, size)))
+    `)
   })
 })
