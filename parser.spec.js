@@ -350,6 +350,14 @@ describe('parser', () => {
 
   describe('programs', () => {
     shouldParse(mergeSpaces`
+      limit => {
+        dot = (a, b) => R.sum(R.zipWith((a,b) => a * b, a, b))
+        R.range(0, limit).reduce((total, i) =>
+          total + dot([i, i , i], [i, i, i]), 0)
+      }
+    `)
+
+    shouldParse(mergeSpaces`
       width => {
         buildMatrix = width => {
           buildRow = i => R.range(0, width).map(x => x + i)
