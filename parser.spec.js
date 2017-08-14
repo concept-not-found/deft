@@ -367,5 +367,10 @@ describe('parser', () => {
         sumMatrix(buildMatrix(width))
       }
     `)
+
+    shouldParse(mergeSpaces`
+      size => R.range(0, 256).reduce((list, i) =>
+        list.map(x => x + 1), R.range(0, size))
+    `)
   })
 })
