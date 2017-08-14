@@ -172,6 +172,15 @@ module.exports = ParserFactory({
     ref('Whitespace'),
     optional(separated(oneOf(
       [
+        '?',
+        ref('Whitespace'),
+        ref('Expression'),
+        ref('Whitespace'),
+        ':',
+        ref('Whitespace'),
+        ref('Expression')
+      ],
+      [
         oneOf(
           '||',
           '&&',

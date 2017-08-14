@@ -348,6 +348,22 @@ describe('parser', () => {
     shouldError('x!x')
   })
 
+  describe('ternary', () => {
+    shouldParse('x?x:x')
+    shouldParse('x? x:x')
+    shouldParse('x?x :x')
+    shouldParse('x?x: x')
+    shouldParse('x? x :x')
+    shouldParse('x? x: x')
+    shouldParse('x?x : x')
+    shouldParse('x? x : x')
+
+    shouldError('x?')
+    shouldError('x?x:')
+    shouldError('x?:x')
+    shouldError('x?:')
+  })
+
   describe('programs', () => {
     shouldParse(mergeSpaces`
       limit => {
@@ -376,6 +392,15 @@ describe('parser', () => {
     shouldParse(mergeSpaces`
       size => R.sum(R.range(0, size).reduce((list, i) =>
         R.reverse(list), R.range(0, size)))
+    `)
+
+    shouldParse(mergeSpaces`
+      {
+        fib = n => n > 1
+          ? fib(n - 1) + fib(n - 2)
+          : n
+        fib
+      }
     `)
   })
 })
