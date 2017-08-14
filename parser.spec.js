@@ -403,4 +403,130 @@ describe('parser', () => {
       }
     `)
   })
+
+  describe.only('strip whitespace', () => {
+    it('should strip empty whitespace', () => {
+      expect(parser('1 + 1', true)).toEqual({
+        ref: 'Root',
+        value: [
+          {
+            ref: 'Numeric',
+            value: '1',
+            start: {
+              index: 0,
+              line: 0,
+              column: 0
+            },
+            end: {
+              index: 1,
+              line: 0,
+              column: 1
+            }
+          },
+          {
+            ref: 'Whitespace',
+            value: ' ',
+            start: {
+              index: 1,
+              line: 0,
+              column: 1
+            },
+            end: {
+              index: 2,
+              line: 0,
+              column: 2
+            }
+          },
+          '+',
+          {
+            ref: 'Whitespace',
+            value: ' ',
+            start: {
+              index: 3,
+              line: 0,
+              column: 3
+            },
+            end: {
+              index: 4,
+              line: 0,
+              column: 4
+            }
+          },
+          {
+            ref: 'Numeric',
+            value: '1',
+            start: {
+              index: 4,
+              line: 0,
+              column: 4
+            },
+            end: {
+              index: 5,
+              line: 0,
+              column: 5
+            }
+          }
+        ],
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 5,
+          line: 0,
+          column: 5
+        },
+        type: 'Success'
+      })
+    }),
+
+    it('should be able to strip all whitespace', () => {
+      expect(parser('1 + 1', false)).toEqual({
+        ref: 'Root',
+        value: [
+          {
+            ref: 'Numeric',
+            value: '1',
+            start: {
+              index: 0,
+              line: 0,
+              column: 0
+            },
+            end: {
+              index: 1,
+              line: 0,
+              column: 1
+            }
+          },
+          '+',
+          {
+            ref: 'Numeric',
+            value: '1',
+            start: {
+              index: 4,
+              line: 0,
+              column: 4
+            },
+            end: {
+              index: 5,
+              line: 0,
+              column: 5
+            }
+          }
+        ],
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 5,
+          line: 0,
+          column: 5
+        },
+        type: 'Success'
+      })
+    })
+  })
 })
