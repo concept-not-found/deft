@@ -10,7 +10,7 @@ function FormLexerFactory(grammar, source) {
       String({value, toString}) {
         if (source.substr(pointer.index, value.length) !== value) {
           return {
-            type: 'Error',
+            result: 'Error',
             error: `expected ${toString()}`,
             pointer
           }
@@ -18,7 +18,7 @@ function FormLexerFactory(grammar, source) {
 
         const {newlineCount, lastLineLength} = countLines(value)
         return {
-          type: 'Success',
+          result: 'Success',
           value,
           start: pointer,
           end: {
@@ -34,10 +34,10 @@ function FormLexerFactory(grammar, source) {
 
       Array({forms}) {
         const result = R.reduceWhile(
-          (previous) => previous.type !== 'Error',
+          (previous) => previous.result !== 'Error',
           (previous, form) => {
             const result = lexForm(form, previous.end)
-            if (result.type === 'Error') {
+            if (result.result === 'Error') {
               return result
             }
             return {
@@ -52,11 +52,11 @@ function FormLexerFactory(grammar, source) {
           },
           forms
         )
-        if (result.type === 'Error') {
+        if (result.result === 'Error') {
           return result
         }
         return {
-          type: 'Success',
+          result: 'Success',
           value: result.value,
           start: result.start,
           end: result.end,
@@ -75,7 +75,7 @@ function FormLexerFactory(grammar, source) {
         const match = source.substr(pointer.index).match(regex)
         if (!match || match.index !== 0) {
           return {
-            type: 'Error',
+            result: 'Error',
             error: `expected ${toString()}`,
             pointer
           }
@@ -84,7 +84,7 @@ function FormLexerFactory(grammar, source) {
 
         const {newlineCount, lastLineLength} = countLines(value)
         return {
-          type: 'Success',
+          result: 'Success',
           value,
           start: pointer,
           end: {
@@ -100,16 +100,16 @@ function FormLexerFactory(grammar, source) {
 
       OneOf({forms, toString}) {
         const match = R.reduceWhile(
-          (previous) => previous.type === 'Error',
+          (previous) => previous.result === 'Error',
           (previous, form) => lexForm(form, pointer),
           {
-            type: 'Error'
+            result: 'Error'
           },
           forms
         )
-        if (match.type === 'Error') {
+        if (match.result === 'Error') {
           return {
-            type: 'Error',
+            result: 'Error',
             error: `expected ${toString()}`,
             pointer
           }
@@ -126,7 +126,7 @@ function FormLexerFactory(grammar, source) {
         while (true) {
           previous = next
           const result = lexForm(form, previous.end)
-          if (result.type === 'Error') {
+          if (result.result === 'Error') {
             break
           }
           next = {
@@ -137,13 +137,13 @@ function FormLexerFactory(grammar, source) {
         }
         if (previous.value.length === 0) {
           return {
-            type: 'Error',
+            result: 'Error',
             error: `expected ${toString()}`,
             pointer
           }
         }
         return {
-          type: 'Success',
+          result: 'Success',
           value: previous.value,
           start: previous.start,
           end: previous.end,
@@ -160,9 +160,9 @@ function FormLexerFactory(grammar, source) {
 
       Optional({form}) {
         const result = lexForm(form, pointer)
-        if (result.type === 'Error') {
+        if (result.result === 'Error') {
           return {
-            type: 'Success',
+            result: 'Success',
             value: '',
             start: pointer,
             end: pointer,
@@ -178,7 +178,7 @@ function FormLexerFactory(grammar, source) {
         const currentRef = `ref("${name}") @ ${pointer.index}`
         if (seenRefs.has(currentRef)) {
           return {
-            type: 'Error',
+            result: 'Error',
             error: `circular reference detected {${[...seenRefs.values()].join(', ')}}`,
             pointer
           }
@@ -186,20 +186,20 @@ function FormLexerFactory(grammar, source) {
         seenRefs.add(currentRef)
         const result = lexForm(grammar[name], pointer)
         seenRefs.delete(currentRef)
-        if (result.type === 'Error') {
+        if (result.result === 'Error') {
           if (!result.ref) {
             result.ref = name
           }
           return result
         }
         const self = {
-          type: 'Success',
+          result: 'Success',
           ref: name,
           value: result.asValue(),
           start: result.start,
           end: result.end,
           asValue() {
-            return R.omit(['type', 'asValue'], self)
+            return R.omit(['result', 'asValue'], self)
           }
         }
         return self
@@ -207,12 +207,12 @@ function FormLexerFactory(grammar, source) {
 
       Except({form, exceptions, toString}) {
         const result = lexForm(form, pointer)
-        if (result.type === 'Error') {
+        if (result.result === 'Error') {
           return result
         }
         if (exceptions.includes(result.value)) {
           return {
-            type: 'Error',
+            result: 'Error',
             error: `expected ${toString()}`,
             pointer
           }
@@ -235,13 +235,13 @@ const self = {
       }
       const result = lexForm(ref('Root'), pointer)
 
-      if (result.type === 'Error') {
+      if (result.result === 'Error') {
         return result
       }
 
       if (source.length > result.end.index) {
         return {
-          type: 'Error',
+          result: 'Error',
           ref: 'Root',
           error: 'unexpected source after Root',
           pointer: result.end
@@ -249,7 +249,7 @@ const self = {
       }
 
       const value = result.asValue()
-      value.type = 'Success'
+      value.result = 'Success'
       return value
     }
   },

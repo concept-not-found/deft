@@ -3,32 +3,32 @@ const lexer = require('./lexer')
 
 function shouldLex(source, debug) {
   it(`should lex ${JSON.stringify(source)}`, () => {
-    const result = lexer(source)
+    const node = lexer(source)
     if (debug) {
-      console.log(JSON.stringify(result, null, 2)) // eslint-disable-line no-console
+      console.log(JSON.stringify(node, null, 2)) // eslint-disable-line no-console
     }
-    expect(result.type).toBe('Success')
+    expect(node.result).toBe('Success')
   })
 }
 
 function shouldError(source, debug) {
   it(`should error ${JSON.stringify(source)}`, () => {
-    const result = lexer(source)
+    const node = lexer(source)
     if (debug) {
-      console.log(JSON.stringify(result, null, 2)) // eslint-disable-line no-console
+      console.log(JSON.stringify(node, null, 2)) // eslint-disable-line no-console
     }
-    expect(result.type).toBe('Error')
+    expect(node.result).toBe('Error')
   })
 }
 
 function shouldNotlexereserveredWord(reservedWord, debug) {
   it(`should not lex ${reservedWord} as an identifier`, () => {
-    const result = lexer(reservedWord)
+    const node = lexer(reservedWord)
     if (debug) {
-      console.log(JSON.stringify(result, null, 2)) // eslint-disable-line no-console
+      console.log(JSON.stringify(node, null, 2)) // eslint-disable-line no-console
     }
-    expect(result.type).toBe('Success')
-    expect(R.path(['value', 'value', 'ref'], result)).not.toBe('Identifier')
+    expect(node.result).toBe('Success')
+    expect(R.path(['value', 'value', 'ref'], node)).not.toBe('Identifier')
   })
 }
 
@@ -432,7 +432,7 @@ describe('lexer', () => {
           line: 0,
           column: 1
         },
-        type: 'Success'
+        result: 'Success'
       })
     })
   })
@@ -510,7 +510,7 @@ describe('lexer', () => {
           line: 0,
           column: 5
         },
-        type: 'Success'
+        result: 'Success'
       })
     }),
 
@@ -558,7 +558,7 @@ describe('lexer', () => {
           line: 0,
           column: 5
         },
-        type: 'Success'
+        result: 'Success'
       })
     })
   })

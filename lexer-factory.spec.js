@@ -8,7 +8,7 @@ describe('lexer factory', () => {
 
     it('should lex exactly hotdog', () => {
       expect(lexer('hotdog')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: 'hotdog',
         start: {
@@ -26,7 +26,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex empty', () => {
       expect(lexer('')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'expected "hotdog"',
         pointer: {
@@ -39,7 +39,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex not hotdog', () => {
       expect(lexer('not hotdog')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'expected "hotdog"',
         pointer: {
@@ -52,7 +52,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex hotdog in your mouth', () => {
       expect(lexer('hotdog in your mouth')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'unexpected source after Root',
         pointer: {
@@ -71,7 +71,7 @@ describe('lexer factory', () => {
 
     it('should lex exactly hotdog', () => {
       expect(lexer('hotdog')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: 'hotdog',
         start: {
@@ -89,7 +89,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex empty', () => {
       expect(lexer('')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'expected "hotdog"',
         pointer: {
@@ -108,7 +108,7 @@ describe('lexer factory', () => {
 
     it('should lex exactly hot\\ndog', () => {
       expect(lexer('hot\ndog')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: 'hot\ndog',
         start: {
@@ -126,7 +126,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex hot\\r\\ndog', () => {
       expect(lexer('hot\r\ndog')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'expected "hot\\ndog"',
         pointer: {
@@ -145,7 +145,7 @@ describe('lexer factory', () => {
 
     it('should lex exactly win\\r\\ndoze', () => {
       expect(lexer('win\r\ndoze')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: 'win\r\ndoze',
         start: {
@@ -163,7 +163,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex hot\\r\\ndog', () => {
       expect(lexer('hot\r\ndog')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'expected "win\\r\\ndoze"',
         pointer: {
@@ -182,7 +182,7 @@ describe('lexer factory', () => {
 
     it('should lex exactly hotdog\\n', () => {
       expect(lexer('hotdog\n')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: 'hotdog\n',
         start: {
@@ -206,7 +206,7 @@ describe('lexer factory', () => {
 
     it('should lex exactly \\nhotdog', () => {
       expect(lexer('\nhotdog')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: '\nhotdog',
         start: {
@@ -230,7 +230,7 @@ describe('lexer factory', () => {
 
     it('should lex exactly hotdog', () => {
       expect(lexer('hotdog')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: ['hot', 'dog'],
         start: {
@@ -248,7 +248,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex empty', () => {
       expect(lexer('')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'expected "hot"',
         pointer: {
@@ -267,7 +267,7 @@ describe('lexer factory', () => {
 
     it('should lex exactly hotdog', () => {
       expect(lexer('hotdog')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: 'hotdog',
         start: {
@@ -285,7 +285,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex empty', () => {
       expect(lexer('')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'expected /hotdog/',
         pointer: {
@@ -298,7 +298,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex veryhotdog', () => {
       expect(lexer('veryhotdog')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'expected /hotdog/',
         pointer: {
@@ -311,7 +311,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex hotdoghotdog', () => {
       expect(lexer('hotdoghotdog')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'unexpected source after Root',
         pointer: {
@@ -330,7 +330,7 @@ describe('lexer factory', () => {
 
     it('should lex star trek', () => {
       expect(lexer('star trek')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: ['star', ' ', 'trek'],
         start: {
@@ -348,7 +348,7 @@ describe('lexer factory', () => {
 
     it('should lex star wars', () => {
       expect(lexer('star wars')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: ['star', ' ', 'wars'],
         start: {
@@ -366,7 +366,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex star stroll', () => {
       expect(lexer('star stroll')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'expected oneOf("trek", "wars")',
         pointer: {
@@ -385,7 +385,7 @@ describe('lexer factory', () => {
 
     it('should lex ㅋ', () => {
       expect(lexer('ㅋ')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: 'ㅋ',
         start: {
@@ -403,7 +403,7 @@ describe('lexer factory', () => {
 
     it('should lex ㅋㅋㅋㅋㅋㅋ', () => {
       expect(lexer('ㅋㅋㅋㅋㅋㅋ')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: ['ㅋ', 'ㅋ', 'ㅋ', 'ㅋ', 'ㅋ', 'ㅋ'],
         start: {
@@ -421,7 +421,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex empty', () => {
       expect(lexer('')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'expected manyOf("ㅋ")',
         pointer: {
@@ -440,7 +440,7 @@ describe('lexer factory', () => {
 
     it('should lex maeby', () => {
       expect(lexer('maeby')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: 'maeby',
         start: {
@@ -458,7 +458,7 @@ describe('lexer factory', () => {
 
     it('should lex empty', () => {
       expect(lexer('')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: '',
         start: {
@@ -483,7 +483,7 @@ describe('lexer factory', () => {
 
     it('should lex hotdog', () => {
       expect(lexer('hotdog')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: [
           'hot',
@@ -517,7 +517,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex hotcat', () => {
       expect(lexer('hotcat')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Animal',
         error: 'expected "dog"',
         pointer: {
@@ -545,23 +545,23 @@ describe('lexer factory', () => {
     })
 
     it('should lex 1', () => {
-      expect(lexer('1').type).toBe('Success')
+      expect(lexer('1').result).toBe('Success')
     })
 
     it('should lex 1+1', () => {
-      expect(lexer('1+1').type).toBe('Success')
+      expect(lexer('1+1').result).toBe('Success')
     })
 
     it('should lex (1+1)', () => {
-      expect(lexer('(1+1)').type).toBe('Success')
+      expect(lexer('(1+1)').result).toBe('Success')
     })
 
     it('should lex 1+(1)', () => {
-      expect(lexer('1+(1)').type).toBe('Success')
+      expect(lexer('1+(1)').result).toBe('Success')
     })
 
     it('should lex 1+(1+1)', () => {
-      expect(lexer('1+(1+1)').type).toBe('Success')
+      expect(lexer('1+(1+1)').result).toBe('Success')
     })
   })
 
@@ -571,7 +571,7 @@ describe('lexer factory', () => {
         Root: ref('Root')
       })
       expect(lexer('')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'circular reference detected {ref("Root") @ 0}',
         pointer: {
@@ -589,7 +589,7 @@ describe('lexer factory', () => {
         B: ref('A')
       })
       expect(lexer('')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'B',
         error: 'circular reference detected {ref("Root") @ 0, ref("A") @ 0, ref("B") @ 0}',
         pointer: {
@@ -608,7 +608,7 @@ describe('lexer factory', () => {
 
     it('should lex exactly 06', () => {
       expect(lexer('06')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: '06',
         start: {
@@ -626,7 +626,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex 42', () => {
       expect(lexer('42')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'expected except(/[0-9]{2}/, "42")',
         pointer: {
@@ -648,7 +648,7 @@ describe('lexer factory', () => {
     })
     it('should lex []', () => {
       expect(lexer('[]')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: ['[', ']'],
         start: {
@@ -666,7 +666,7 @@ describe('lexer factory', () => {
 
     it('should lex [1]', () => {
       expect(lexer('[1]')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: ['[', '1', ']'],
         start: {
@@ -684,7 +684,7 @@ describe('lexer factory', () => {
 
     it('should lex [1,2]', () => {
       expect(lexer('[1,2]')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: ['[', '1', ',', '2', ']'],
         start: {
@@ -702,7 +702,7 @@ describe('lexer factory', () => {
 
     it('should lex [1,2,3]', () => {
       expect(lexer('[1,2,3]')).toEqual({
-        type: 'Success',
+        result: 'Success',
         ref: 'Root',
         value: ['[', '1', ',', '2', ',', '3', ']'],
         start: {
@@ -720,7 +720,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex [,2]', () => {
       expect(lexer('[,2]')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'expected "]"',
         pointer: {
@@ -733,7 +733,7 @@ describe('lexer factory', () => {
 
     it('should fail to lex [1,]', () => {
       expect(lexer('[1,]')).toEqual({
-        type: 'Error',
+        result: 'Error',
         ref: 'Root',
         error: 'expected "]"',
         pointer: {
