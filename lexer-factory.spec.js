@@ -1,13 +1,13 @@
-const {ParserFactory, oneOf, manyOf, optional, ref, except, separated} = require('./parser-factory')
+const {LexerFactory, oneOf, manyOf, optional, ref, except, separated} = require('./lexer-factory')
 
-describe('parser factory', () => {
-  describe('hotdog parser', () => {
-    const parser = ParserFactory({
+describe('lexer factory', () => {
+  describe('hotdog lexer', () => {
+    const lexer = LexerFactory({
       Root: 'hotdog'
     })
 
-    it('should parse exactly hotdog', () => {
-      expect(parser('hotdog')).toEqual({
+    it('should lex exactly hotdog', () => {
+      expect(lexer('hotdog')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: 'hotdog',
@@ -24,8 +24,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse empty', () => {
-      expect(parser('')).toEqual({
+    it('should fail to lex empty', () => {
+      expect(lexer('')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'expected "hotdog"',
@@ -37,8 +37,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse not hotdog', () => {
-      expect(parser('not hotdog')).toEqual({
+    it('should fail to lex not hotdog', () => {
+      expect(lexer('not hotdog')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'expected "hotdog"',
@@ -50,8 +50,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse hotdog in your mouth', () => {
-      expect(parser('hotdog in your mouth')).toEqual({
+    it('should fail to lex hotdog in your mouth', () => {
+      expect(lexer('hotdog in your mouth')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'unexpected source after Root',
@@ -64,13 +64,13 @@ describe('parser factory', () => {
     })
   })
 
-  describe('hotdog parser with extra array', () => {
-    const parser = ParserFactory({
+  describe('hotdog lexer with extra array', () => {
+    const lexer = LexerFactory({
       Root: ['hotdog']
     })
 
-    it('should parse exactly hotdog', () => {
-      expect(parser('hotdog')).toEqual({
+    it('should lex exactly hotdog', () => {
+      expect(lexer('hotdog')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: 'hotdog',
@@ -87,8 +87,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse empty', () => {
-      expect(parser('')).toEqual({
+    it('should fail to lex empty', () => {
+      expect(lexer('')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'expected "hotdog"',
@@ -101,13 +101,13 @@ describe('parser factory', () => {
     })
   })
 
-  describe('hot\\ndog parser', () => {
-    const parser = ParserFactory({
+  describe('hot\\ndog lexer', () => {
+    const lexer = LexerFactory({
       Root: 'hot\ndog'
     })
 
-    it('should parse exactly hot\\ndog', () => {
-      expect(parser('hot\ndog')).toEqual({
+    it('should lex exactly hot\\ndog', () => {
+      expect(lexer('hot\ndog')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: 'hot\ndog',
@@ -124,8 +124,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse hot\\r\\ndog', () => {
-      expect(parser('hot\r\ndog')).toEqual({
+    it('should fail to lex hot\\r\\ndog', () => {
+      expect(lexer('hot\r\ndog')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'expected "hot\\ndog"',
@@ -138,13 +138,13 @@ describe('parser factory', () => {
     })
   })
 
-  describe('win\\r\\ndoze parser', () => {
-    const parser = ParserFactory({
+  describe('win\\r\\ndoze lexer', () => {
+    const lexer = LexerFactory({
       Root: 'win\r\ndoze'
     })
 
-    it('should parse exactly win\\r\\ndoze', () => {
-      expect(parser('win\r\ndoze')).toEqual({
+    it('should lex exactly win\\r\\ndoze', () => {
+      expect(lexer('win\r\ndoze')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: 'win\r\ndoze',
@@ -161,8 +161,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse hot\\r\\ndog', () => {
-      expect(parser('hot\r\ndog')).toEqual({
+    it('should fail to lex hot\\r\\ndog', () => {
+      expect(lexer('hot\r\ndog')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'expected "win\\r\\ndoze"',
@@ -175,13 +175,13 @@ describe('parser factory', () => {
     })
   })
 
-  describe('hotdog\\n parser', () => {
-    const parser = ParserFactory({
+  describe('hotdog\\n lexer', () => {
+    const lexer = LexerFactory({
       Root: 'hotdog\n'
     })
 
-    it('should parse exactly hotdog\\n', () => {
-      expect(parser('hotdog\n')).toEqual({
+    it('should lex exactly hotdog\\n', () => {
+      expect(lexer('hotdog\n')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: 'hotdog\n',
@@ -199,13 +199,13 @@ describe('parser factory', () => {
     })
   })
 
-  describe('\\nhotdog parser', () => {
-    const parser = ParserFactory({
+  describe('\\nhotdog lexer', () => {
+    const lexer = LexerFactory({
       Root: '\nhotdog'
     })
 
-    it('should parse exactly \\nhotdog', () => {
-      expect(parser('\nhotdog')).toEqual({
+    it('should lex exactly \\nhotdog', () => {
+      expect(lexer('\nhotdog')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: '\nhotdog',
@@ -223,13 +223,13 @@ describe('parser factory', () => {
     })
   })
 
-  describe('hotdog parser using array', () => {
-    const parser = ParserFactory({
+  describe('hotdog lexer using array', () => {
+    const lexer = LexerFactory({
       Root: ['hot', 'dog']
     })
 
-    it('should parse exactly hotdog', () => {
-      expect(parser('hotdog')).toEqual({
+    it('should lex exactly hotdog', () => {
+      expect(lexer('hotdog')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: ['hot', 'dog'],
@@ -246,8 +246,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse empty', () => {
-      expect(parser('')).toEqual({
+    it('should fail to lex empty', () => {
+      expect(lexer('')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'expected "hot"',
@@ -260,13 +260,13 @@ describe('parser factory', () => {
     })
   })
 
-  describe('hotdog parser using regex', () => {
-    const parser = ParserFactory({
+  describe('hotdog lexer using regex', () => {
+    const lexer = LexerFactory({
       Root: /hotdog/
     })
 
-    it('should parse exactly hotdog', () => {
-      expect(parser('hotdog')).toEqual({
+    it('should lex exactly hotdog', () => {
+      expect(lexer('hotdog')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: 'hotdog',
@@ -283,8 +283,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse empty', () => {
-      expect(parser('')).toEqual({
+    it('should fail to lex empty', () => {
+      expect(lexer('')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'expected /hotdog/',
@@ -296,8 +296,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse veryhotdog', () => {
-      expect(parser('veryhotdog')).toEqual({
+    it('should fail to lex veryhotdog', () => {
+      expect(lexer('veryhotdog')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'expected /hotdog/',
@@ -309,8 +309,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse hotdoghotdog', () => {
-      expect(parser('hotdoghotdog')).toEqual({
+    it('should fail to lex hotdoghotdog', () => {
+      expect(lexer('hotdoghotdog')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'unexpected source after Root',
@@ -323,13 +323,13 @@ describe('parser factory', () => {
     })
   })
 
-  describe('star trek|war parser', () => {
-    const parser = ParserFactory({
+  describe('star trek|war lexer', () => {
+    const lexer = LexerFactory({
       Root: ['star', ' ', oneOf('trek', 'wars')]
     })
 
-    it('should parse star trek', () => {
-      expect(parser('star trek')).toEqual({
+    it('should lex star trek', () => {
+      expect(lexer('star trek')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: ['star', ' ', 'trek'],
@@ -346,8 +346,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should parse star wars', () => {
-      expect(parser('star wars')).toEqual({
+    it('should lex star wars', () => {
+      expect(lexer('star wars')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: ['star', ' ', 'wars'],
@@ -364,8 +364,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse star stroll', () => {
-      expect(parser('star stroll')).toEqual({
+    it('should fail to lex star stroll', () => {
+      expect(lexer('star stroll')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'expected oneOf("trek", "wars")',
@@ -378,13 +378,13 @@ describe('parser factory', () => {
     })
   })
 
-  describe('ㅋㅋㅋㅋㅋㅋ parser', () => {
-    const parser = ParserFactory({
+  describe('ㅋㅋㅋㅋㅋㅋ lexer', () => {
+    const lexer = LexerFactory({
       Root: manyOf('ㅋ')
     })
 
-    it('should parse ㅋ', () => {
-      expect(parser('ㅋ')).toEqual({
+    it('should lex ㅋ', () => {
+      expect(lexer('ㅋ')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: 'ㅋ',
@@ -401,8 +401,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should parse ㅋㅋㅋㅋㅋㅋ', () => {
-      expect(parser('ㅋㅋㅋㅋㅋㅋ')).toEqual({
+    it('should lex ㅋㅋㅋㅋㅋㅋ', () => {
+      expect(lexer('ㅋㅋㅋㅋㅋㅋ')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: ['ㅋ', 'ㅋ', 'ㅋ', 'ㅋ', 'ㅋ', 'ㅋ'],
@@ -419,8 +419,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse empty', () => {
-      expect(parser('')).toEqual({
+    it('should fail to lex empty', () => {
+      expect(lexer('')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'expected manyOf("ㅋ")',
@@ -433,13 +433,13 @@ describe('parser factory', () => {
     })
   })
 
-  describe('maeby parser', () => {
-    const parser = ParserFactory({
+  describe('maeby lexer', () => {
+    const lexer = LexerFactory({
       Root: optional('maeby')
     })
 
-    it('should parse maeby', () => {
-      expect(parser('maeby')).toEqual({
+    it('should lex maeby', () => {
+      expect(lexer('maeby')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: 'maeby',
@@ -456,8 +456,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should parse empty', () => {
-      expect(parser('')).toEqual({
+    it('should lex empty', () => {
+      expect(lexer('')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: '',
@@ -475,14 +475,14 @@ describe('parser factory', () => {
     })
   })
 
-  describe('hotdog parser with ref', () => {
-    const parser = ParserFactory({
+  describe('hotdog lexer with ref', () => {
+    const lexer = LexerFactory({
       Root: ['hot', ref('Animal')],
       Animal: 'dog'
     })
 
-    it('should parse hotdog', () => {
-      expect(parser('hotdog')).toEqual({
+    it('should lex hotdog', () => {
+      expect(lexer('hotdog')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: [
@@ -515,8 +515,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse hotcat', () => {
-      expect(parser('hotcat')).toEqual({
+    it('should fail to lex hotcat', () => {
+      expect(lexer('hotcat')).toEqual({
         type: 'Error',
         ref: 'Animal',
         error: 'expected "dog"',
@@ -529,8 +529,8 @@ describe('parser factory', () => {
     })
   })
 
-  describe('A -> (A) | B+B | 1; B -> (A) | 1 parser', () => {
-    const parser = ParserFactory({
+  describe('A -> (A) | B+B | 1; B -> (A) | 1 lexer', () => {
+    const lexer = LexerFactory({
       Root: ref('Expression'),
       Expression: oneOf(
         ['(', ref('Expression'), ')'],
@@ -544,33 +544,33 @@ describe('parser factory', () => {
       Literal: 1
     })
 
-    it('should parse 1', () => {
-      expect(parser('1').type).toBe('Success')
+    it('should lex 1', () => {
+      expect(lexer('1').type).toBe('Success')
     })
 
-    it('should parse 1+1', () => {
-      expect(parser('1+1').type).toBe('Success')
+    it('should lex 1+1', () => {
+      expect(lexer('1+1').type).toBe('Success')
     })
 
-    it('should parse (1+1)', () => {
-      expect(parser('(1+1)').type).toBe('Success')
+    it('should lex (1+1)', () => {
+      expect(lexer('(1+1)').type).toBe('Success')
     })
 
-    it('should parse 1+(1)', () => {
-      expect(parser('1+(1)').type).toBe('Success')
+    it('should lex 1+(1)', () => {
+      expect(lexer('1+(1)').type).toBe('Success')
     })
 
-    it('should parse 1+(1+1)', () => {
-      expect(parser('1+(1+1)').type).toBe('Success')
+    it('should lex 1+(1+1)', () => {
+      expect(lexer('1+(1+1)').type).toBe('Success')
     })
   })
 
   describe('circular references', () => {
     it('should detect Root -> Root', () => {
-      const parser = ParserFactory({
+      const lexer = LexerFactory({
         Root: ref('Root')
       })
-      expect(parser('')).toEqual({
+      expect(lexer('')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'circular reference detected {ref("Root") @ 0}',
@@ -583,12 +583,12 @@ describe('parser factory', () => {
     })
 
     it('should detect A -> B -> A', () => {
-      const parser = ParserFactory({
+      const lexer = LexerFactory({
         Root: ref('A'),
         A: ref('B'),
         B: ref('A')
       })
-      expect(parser('')).toEqual({
+      expect(lexer('')).toEqual({
         type: 'Error',
         ref: 'B',
         error: 'circular reference detected {ref("Root") @ 0, ref("A") @ 0, ref("B") @ 0}',
@@ -601,13 +601,13 @@ describe('parser factory', () => {
     })
   })
 
-  describe('a two digit number, except 42 parser', () => {
-    const parser = ParserFactory({
+  describe('a two digit number, except 42 lexer', () => {
+    const lexer = LexerFactory({
       Root: except(/[0-9]{2}/, 42)
     })
 
-    it('should parse exactly 06', () => {
-      expect(parser('06')).toEqual({
+    it('should lex exactly 06', () => {
+      expect(lexer('06')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: '06',
@@ -624,8 +624,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse 42', () => {
-      expect(parser('42')).toEqual({
+    it('should fail to lex 42', () => {
+      expect(lexer('42')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'expected except(/[0-9]{2}/, "42")',
@@ -638,16 +638,16 @@ describe('parser factory', () => {
     })
   })
 
-  describe('[1,2,3] parser', () => {
-    const parser = ParserFactory({
+  describe('[1,2,3] lexer', () => {
+    const lexer = LexerFactory({
       Root: [
         '[',
         optional(separated(oneOf(1, 2, 3), ',')),
         ']'
       ]
     })
-    it('should parse []', () => {
-      expect(parser('[]')).toEqual({
+    it('should lex []', () => {
+      expect(lexer('[]')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: ['[', ']'],
@@ -664,8 +664,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should parse [1]', () => {
-      expect(parser('[1]')).toEqual({
+    it('should lex [1]', () => {
+      expect(lexer('[1]')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: ['[', '1', ']'],
@@ -682,8 +682,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should parse [1,2]', () => {
-      expect(parser('[1,2]')).toEqual({
+    it('should lex [1,2]', () => {
+      expect(lexer('[1,2]')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: ['[', '1', ',', '2', ']'],
@@ -700,8 +700,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should parse [1,2,3]', () => {
-      expect(parser('[1,2,3]')).toEqual({
+    it('should lex [1,2,3]', () => {
+      expect(lexer('[1,2,3]')).toEqual({
         type: 'Success',
         ref: 'Root',
         value: ['[', '1', ',', '2', ',', '3', ']'],
@@ -718,8 +718,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse [,2]', () => {
-      expect(parser('[,2]')).toEqual({
+    it('should fail to lex [,2]', () => {
+      expect(lexer('[,2]')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'expected "]"',
@@ -731,8 +731,8 @@ describe('parser factory', () => {
       })
     })
 
-    it('should fail to parse [1,]', () => {
-      expect(parser('[1,]')).toEqual({
+    it('should fail to lex [1,]', () => {
+      expect(lexer('[1,]')).toEqual({
         type: 'Error',
         ref: 'Root',
         error: 'expected "]"',

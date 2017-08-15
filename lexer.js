@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const {ParserFactory, oneOf, optional, ref, except, separated, zeroOrMoreOf} = require('./parser-factory')
+const {LexerFactory, oneOf, optional, ref, except, separated, zeroOrMoreOf} = require('./lexer-factory')
 
 const reservedWords = [
   'null',
@@ -48,7 +48,7 @@ function flatmap(refMap, node) {
 }
 
 module.exports = (source, keepWhitespace = true) => {
-  const root = ParserFactory({
+  const root = LexerFactory({
     Null: 'null',
 
     Boolean: oneOf('true', 'false'),

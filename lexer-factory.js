@@ -3,9 +3,9 @@ const match = require('./match')
 const {GrammarFactory, oneOf, manyOf, optional, ref, except} = require('./grammar-factory')
 const {count: countLines} = require('./lines')
 
-function FormParserFactory(grammar, source) {
+function FormLexerFactory(grammar, source) {
   const seenRefs = new Set()
-  function parseForm(form, pointer) {
+  function lexForm(form, pointer) {
     return match({
       String({value, toString}) {
         if (source.substr(pointer.index, value.length) !== value) {
@@ -36,7 +36,7 @@ function FormParserFactory(grammar, source) {
         const result = R.reduceWhile(
           (previous) => previous.type !== 'Error',
           (previous, form) => {
-            const result = parseForm(form, previous.end)
+            const result = lexForm(form, previous.end)
             if (result.type === 'Error') {
               return result
             }
@@ -101,7 +101,7 @@ function FormParserFactory(grammar, source) {
       OneOf({forms, toString}) {
         const match = R.reduceWhile(
           (previous) => previous.type === 'Error',
-          (previous, form) => parseForm(form, pointer),
+          (previous, form) => lexForm(form, pointer),
           {
             type: 'Error'
           },
@@ -125,7 +125,7 @@ function FormParserFactory(grammar, source) {
         }
         while (true) {
           previous = next
-          const result = parseForm(form, previous.end)
+          const result = lexForm(form, previous.end)
           if (result.type === 'Error') {
             break
           }
@@ -159,7 +159,7 @@ function FormParserFactory(grammar, source) {
       },
 
       Optional({form}) {
-        const result = parseForm(form, pointer)
+        const result = lexForm(form, pointer)
         if (result.type === 'Error') {
           return {
             type: 'Success',
@@ -184,7 +184,7 @@ function FormParserFactory(grammar, source) {
           }
         }
         seenRefs.add(currentRef)
-        const result = parseForm(grammar[name], pointer)
+        const result = lexForm(grammar[name], pointer)
         seenRefs.delete(currentRef)
         if (result.type === 'Error') {
           if (!result.ref) {
@@ -206,7 +206,7 @@ function FormParserFactory(grammar, source) {
       },
 
       Except({form, exceptions, toString}) {
-        const result = parseForm(form, pointer)
+        const result = lexForm(form, pointer)
         if (result.type === 'Error') {
           return result
         }
@@ -221,19 +221,19 @@ function FormParserFactory(grammar, source) {
       }
     })(form)
   }
-  return parseForm
+  return lexForm
 }
 
 const self = {
-  ParserFactory(grammar) {
+  LexerFactory(grammar) {
     return (source) => {
-      const parseForm = FormParserFactory(GrammarFactory(grammar), source)
+      const lexForm = FormLexerFactory(GrammarFactory(grammar), source)
       const pointer = {
         index: 0,
         line: 0,
         column: 0
       }
-      const result = parseForm(ref('Root'), pointer)
+      const result = lexForm(ref('Root'), pointer)
 
       if (result.type === 'Error') {
         return result
