@@ -404,6 +404,39 @@ describe('lexer', () => {
     `)
   })
 
+  describe('simpify', () => {
+    it('should remove expressions and unneeded arrays', () => {
+      expect(lexer('1')).toEqual({
+        ref: 'Root',
+        value: {
+          ref: 'Numeric',
+          value: '1',
+          start: {
+            index: 0,
+            line: 0,
+            column: 0
+          },
+          end: {
+            index: 1,
+            line: 0,
+            column: 1
+          }
+        },
+        start: {
+          index: 0,
+          line: 0,
+          column: 0
+        },
+        end: {
+          index: 1,
+          line: 0,
+          column: 1
+        },
+        type: 'Success'
+      })
+    })
+  })
+
   describe('strip whitespace', () => {
     it('should strip empty whitespace', () => {
       expect(lexer('1 + 1', true)).toEqual({

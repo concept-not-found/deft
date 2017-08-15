@@ -14,16 +14,22 @@ function flatten(node) {
     return
   }
   if (node.value && node.value instanceof Array) {
+    const value = R.unnest(node.value
+      .map(flatten)
+      .filter(Boolean))
     return Object.assign({}, node, {
-      value: R.unnest(node.value
-        .map(flatten)
-        .filter(Boolean))
+      value: value.length === 1
+        ? value[0]
+        : value
     })
   }
   if (node instanceof Array) {
-    return R.unnest(node
+    const value = R.unnest(node
       .map(flatten)
       .filter(Boolean))
+    return value.length === 1
+      ? value[0]
+      : value
   }
   return node
 }
