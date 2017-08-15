@@ -6,7 +6,7 @@ const {count: countLines} = require('./lines')
 function FormLexerFactory(grammar, source) {
   const seenRefs = new Set()
   function lexForm(form, pointer) {
-    return match({
+    return match('type')({
       String({value, toString}) {
         if (source.substr(pointer.index, value.length) !== value) {
           return {

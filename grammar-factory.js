@@ -39,7 +39,7 @@ function normalize(form) {
     return self
   }
 
-  return match({
+  return match('type')({
     OneOf({forms}) {
       const self = {
         type: 'OneOf',
