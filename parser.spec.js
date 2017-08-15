@@ -404,7 +404,7 @@ describe('parser', () => {
     `)
   })
 
-  describe.only('strip whitespace', () => {
+  describe('strip whitespace', () => {
     it('should strip empty whitespace', () => {
       expect(parser('1 + 1', true)).toEqual({
         ref: 'Root',
