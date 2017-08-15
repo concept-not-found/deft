@@ -23,6 +23,13 @@ function parser(state, node) {
               term: 'Num',
               value: Number(value)
             }
+          },
+
+          String({value}) {
+            return {
+              term: 'Str',
+              value
+            }
           }
         })(node)
       }
