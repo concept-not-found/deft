@@ -1,7 +1,7 @@
 const parser = require('./parser')
 
 describe('parser', () => {
-  it('should parse Numeric to Num', () => {
+  it('should parse Numeric to JavaScript number', () => {
     const node = {
       ref: 'Root',
       value:{
@@ -32,12 +32,11 @@ describe('parser', () => {
     }
     expect(parser(node)).toEqual({
       result: 'Success',
-      term: 'Num',
       value: 0
     })
   })
 
-  it('should parse String to Str', () => {
+  it('should parse String to a JavaScript string', () => {
     const node = {
       ref: 'Root',
       value:{
@@ -68,12 +67,11 @@ describe('parser', () => {
     }
     expect(parser(node)).toEqual({
       result: 'Success',
-      term: 'Str',
       value: '0'
     })
   })
 
-  it('should parse Identifier to Var', () => {
+  it('should parse Identifier to Reference', () => {
     const node = {
       ref: 'Root',
       value:{
@@ -104,8 +102,10 @@ describe('parser', () => {
     }
     expect(parser(node)).toEqual({
       result: 'Success',
-      term: 'Var',
-      value: 'x'
+      value: {
+        term: 'Reference',
+        value: 'x'
+      }
     })
   })
 })

@@ -3,48 +3,49 @@ const match = require('./match')
 const matchRef = match('ref')
 const matchName = match('name')
 
-function parser(state, node) {
-  try {
-    const result = matchName({
+function parser(node) {
+  function parse(state, current) {
+    return matchName({
       Root() {
         return matchRef({
           Root({value}) {
-            return parser({
+            return parse({
               name: 'Expression'
             }, value)
           }
-        })(node)
+        })(current)
       },
 
       Expression() {
         return matchRef({
           Numeric({value}) {
-            return {
-              term: 'Num',
-              value: Number(value)
-            }
+            return Number(value)
           },
 
           String({value}) {
-            return {
-              term: 'Str',
-              value
-            }
+            return value
           },
 
           Identifier({value}) {
             return {
-              term: 'Var',
+              term: 'Reference',
               value
             }
           }
-        })(node)
+        })(current)
       }
     })(state)
+  }
 
-    return Object.assign({
+  try {
+    const result = parse({
+      name: 'Root'
+    }, node)
+
+    return {
       result: 'Success',
-    }, result)
+      value: result
+    }
   } catch (error) {
     return {
       result: 'Error',
@@ -53,6 +54,4 @@ function parser(state, node) {
   }
 }
 
-module.exports = (node) => parser({
-  name: 'Root'
-}, node)
+module.exports = (node) => parser(node)
