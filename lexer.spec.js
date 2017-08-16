@@ -79,7 +79,7 @@ describe('lexer', () => {
       shouldLex('false')
     })
 
-    describe('numberic', () => {
+    describe('numeric', () => {
       shouldLex('0')
       shouldLex('10')
       shouldLex('.0')

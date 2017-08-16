@@ -30,6 +30,13 @@ function parser(state, node) {
               term: 'Str',
               value
             }
+          },
+
+          Identifier({value}) {
+            return {
+              term: 'Var',
+              value
+            }
           }
         })(node)
       }
