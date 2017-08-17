@@ -24,11 +24,23 @@ function parser(node) {
             name: 'Expression',
           }, current[0])
           //postfix
-          if (current[1] === '(' && current[2] === ')') {
-            return {
-              term: 'Call',
-              function: main,
-              arguments: []
+          if (current[1] === '(') {
+            if (current[2] === ')') {
+              return {
+                term: 'Call',
+                function: main,
+                arguments: []
+              }
+            } else {
+              return {
+                term: 'Call',
+                function: main,
+                arguments: [
+                  parse({
+                    name: 'Expression',
+                  }, current[2])
+                ]
+              }
             }
           }
           return main

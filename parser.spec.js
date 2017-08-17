@@ -40,4 +40,23 @@ describe('parser', () => {
     })
   })
 
+  it('should parse x(y) to Call with an argument', () => {
+    expect(parser(lexer('x(y)'))).toEqual({
+      result: 'Success',
+      value: {
+        term: 'Call',
+        function: {
+          term: 'Reference',
+          value: 'x'
+        },
+        arguments: [
+          {
+            term: 'Reference',
+            value: 'y'
+          }
+        ]
+      }
+    })
+  })
+
 })
