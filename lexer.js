@@ -53,7 +53,7 @@ function flatmap(refMap, node) {
   return flatten(map(refMap, node))
 }
 
-module.exports = (source, keepWhitespace = true) => {
+module.exports = (source, keepWhitespace = false) => {
   const root = LexerFactory({
     Null: 'null',
 

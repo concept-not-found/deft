@@ -515,7 +515,7 @@ describe('lexer', () => {
     }),
 
     it('should be able to strip all whitespace', () => {
-      expect(lexer('1 + 1', false)).toEqual({
+      expect(lexer('1 + 1')).toEqual({
         ref: 'Root',
         value: [
           {
