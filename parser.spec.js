@@ -1,106 +1,23 @@
+const lexer = require('./lexer')
 const parser = require('./parser')
 
 describe('parser', () => {
-  it('should parse Numeric to JavaScript number', () => {
-    const node = {
-      ref: 'Root',
-      value:{
-        ref: 'Numeric',
-        value: '0',
-        start: {
-          index: 0,
-          line: 0,
-          column: 0
-        },
-        end: {
-          index: 1,
-          line: 0,
-          column: 1
-        }
-      },
-      start: {
-        index: 0,
-        line: 0,
-        column: 0
-      },
-      end: {
-        index: 1,
-        line: 0,
-        column: 1
-      },
-      type: 'Success'
-    }
-    expect(parser(node)).toEqual({
+  it('should parse 0 to JavaScript number', () => {
+    expect(parser(lexer('0'))).toEqual({
       result: 'Success',
       value: 0
     })
   })
 
-  it('should parse String to a JavaScript string', () => {
-    const node = {
-      ref: 'Root',
-      value:{
-        ref: 'String',
-        value: '0',
-        start: {
-          index: 0,
-          line: 0,
-          column: 0
-        },
-        end: {
-          index: 1,
-          line: 0,
-          column: 1
-        }
-      },
-      start: {
-        index: 0,
-        line: 0,
-        column: 0
-      },
-      end: {
-        index: 1,
-        line: 0,
-        column: 1
-      },
-      type: 'Success'
-    }
-    expect(parser(node)).toEqual({
+  it('should parse "0" to a JavaScript string', () => {
+    expect(parser(lexer('"0"'))).toEqual({
       result: 'Success',
       value: '0'
     })
   })
 
-  it('should parse Identifier to Reference', () => {
-    const node = {
-      ref: 'Root',
-      value:{
-        ref: 'Identifier',
-        value: 'x',
-        start: {
-          index: 0,
-          line: 0,
-          column: 0
-        },
-        end: {
-          index: 1,
-          line: 0,
-          column: 1
-        }
-      },
-      start: {
-        index: 0,
-        line: 0,
-        column: 0
-      },
-      end: {
-        index: 1,
-        line: 0,
-        column: 1
-      },
-      type: 'Success'
-    }
-    expect(parser(node)).toEqual({
+  it('should parse x to Reference', () => {
+    expect(parser(lexer('x'))).toEqual({
       result: 'Success',
       value: {
         term: 'Reference',
@@ -108,4 +25,19 @@ describe('parser', () => {
       }
     })
   })
+
+  it('should parse x() to Call', () => {
+    expect(parser(lexer('x()'))).toEqual({
+      result: 'Success',
+      value: {
+        term: 'Call',
+        function: {
+          term: 'Reference',
+          value: 'x'
+        },
+        arguments: []
+      }
+    })
+  })
+
 })

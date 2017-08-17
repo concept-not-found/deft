@@ -17,12 +17,28 @@ function parser(node) {
       },
 
       Expression() {
+        if (current instanceof Array) {
+          //prefix
+          //main
+          const main = parse({
+            name: 'Expression',
+          }, current[0])
+          //postfix
+          if (current[1] === '(' && current[2] === ')') {
+            return {
+              term: 'Call',
+              function: main,
+              arguments: []
+            }
+          }
+          return main
+        }
         return matchRef({
           Numeric({value}) {
             return Number(value)
           },
 
-          String({value}) {
+          String({value: [openQuote, value, closeQuote]}) {
             return value
           },
 
