@@ -16,35 +16,7 @@ function parser(node) {
         })(current)
       },
 
-      Expression() {
-        if (current instanceof Array) {
-          //prefix
-          //main
-          const main = parse({
-            name: 'Expression',
-          }, current[0])
-          //postfix
-          if (current[1] === '(') {
-            if (current[2] === ')') {
-              return {
-                term: 'Call',
-                function: main,
-                arguments: []
-              }
-            } else {
-              return {
-                term: 'Call',
-                function: main,
-                arguments: [
-                  parse({
-                    name: 'Expression',
-                  }, current[2])
-                ]
-              }
-            }
-          }
-          return main
-        }
+      MainExpression() {
         return matchRef({
           Numeric({value}) {
             return Number(value)
@@ -61,6 +33,42 @@ function parser(node) {
             }
           }
         })(current)
+      },
+
+      Expression() {
+        if (current instanceof Array) {
+          const {index = 0} = state
+          //prefix
+          //main
+          const main = parse({
+            name: 'MainExpression',
+          }, current[index])
+          //postfix
+          if (current[index + 1] === '(') {
+            if (current[index + 1 + 1] === ')') {
+              return {
+                term: 'Call',
+                function: main,
+                arguments: []
+              }
+            } else {
+              return {
+                term: 'Call',
+                function: main,
+                arguments: [
+                  parse({
+                    name: 'Expression',
+                    index: index + 1 + 1
+                  }, current)
+                ]
+              }
+            }
+          }
+          return main
+        }
+        return parse({
+          name: 'MainExpression',
+        }, current)
       }
     })(state)
   }
