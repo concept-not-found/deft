@@ -45,23 +45,26 @@ function parser(node) {
           }, current[index])
           //postfix
           if (current[index + 1] === '(') {
-            if (current[index + 1 + 1] === ')') {
-              return {
-                term: 'Call',
-                function: main,
-                arguments: []
+            let argumentIndex = 0
+            const args = []
+            if (current[index + 1 + 1 + argumentIndex] !== ')') {
+              while (true) {
+                const argument = parse({
+                  name: 'Expression',
+                  index: index + 1 + 1 + argumentIndex
+                }, current)
+                args.push(argument)
+                if (index + 1 + 1 + argumentIndex + 1 >= current.length || current[index + 1 + 1 + argumentIndex + 1] === ')') {
+                  break
+                }
+                // skip comma
+                argumentIndex += 2
               }
-            } else {
-              return {
-                term: 'Call',
-                function: main,
-                arguments: [
-                  parse({
-                    name: 'Expression',
-                    index: index + 1 + 1
-                  }, current)
-                ]
-              }
+            }
+            return {
+              term: 'Call',
+              function: main,
+              arguments: args
             }
           }
           return main
