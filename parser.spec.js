@@ -5,14 +5,22 @@ describe('parser', () => {
   it('should parse 0 to JavaScript number', () => {
     expect(parser(lexer('0'))).toEqual({
       result: 'Success',
-      value: 0
+      value: {
+        term: 'Number',
+        value: 0,
+        consumed: 1
+      }
     })
   })
 
   it('should parse "0" to a JavaScript string', () => {
     expect(parser(lexer('"0"'))).toEqual({
       result: 'Success',
-      value: '0'
+      value: {
+        term: 'String',
+        value: '0',
+        consumed: 1
+      }
     })
   })
 
@@ -21,7 +29,8 @@ describe('parser', () => {
       result: 'Success',
       value: {
         term: 'Reference',
-        value: 'x'
+        value: 'x',
+        consumed: 1
       }
     })
   })
@@ -33,9 +42,11 @@ describe('parser', () => {
         term: 'Call',
         function: {
           term: 'Reference',
-          value: 'x'
+          value: 'x',
+          consumed: 1
         },
-        arguments: []
+        arguments: [],
+        consumed: 3
       }
     })
   })
@@ -47,37 +58,82 @@ describe('parser', () => {
         term: 'Call',
         function: {
           term: 'Reference',
-          value: 'x'
+          value: 'x',
+          consumed: 1
         },
         arguments: [
           {
             term: 'Reference',
-            value: 'y'
+            value: 'y',
+            consumed: 1
           }
-        ]
+        ],
+        consumed: 4
       }
     })
   })
 
   it('should parse x(y, z) to Call with arguments', () => {
-    expect(parser(lexer('x(y,z)'))).toEqual({
+    expect(parser(lexer('x(y, z)'))).toEqual({
       result: 'Success',
       value: {
         term: 'Call',
         function: {
           term: 'Reference',
-          value: 'x'
+          value: 'x',
+          consumed: 1
         },
         arguments: [
           {
             term: 'Reference',
-            value: 'y'
+            value: 'y',
+            consumed: 1
           },
           {
             term: 'Reference',
-            value: 'z'
+            value: 'z',
+            consumed: 1
           }
-        ]
+        ],
+        consumed: 6
+      }
+    })
+  })
+
+  it('should parse x(y(a), z) to nested Call with arguments', () => {
+    expect(parser(lexer('x(y(a), z)'))).toEqual({
+      result: 'Success',
+      value: {
+        term: 'Call',
+        function: {
+          term: 'Reference',
+          value: 'x',
+          consumed: 1
+        },
+        arguments: [
+          {
+            term: 'Call',
+            function: {
+              term: 'Reference',
+              value: 'y',
+              consumed: 1
+            },
+            arguments: [
+              {
+                term: 'Reference',
+                value: 'a',
+                consumed: 1
+              }
+            ],
+            consumed: 4
+          },
+          {
+            term: 'Reference',
+            value: 'z',
+            consumed: 1
+          }
+        ],
+        consumed: 9
       }
     })
   })

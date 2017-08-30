@@ -19,17 +19,26 @@ function parser(node) {
       MainExpression() {
         return matchRef({
           Numeric({value}) {
-            return Number(value)
+            return {
+              term: 'Number',
+              value: Number(value),
+              consumed: 1
+            }
           },
 
           String({value: [openQuote, value, closeQuote]}) {
-            return value
+            return {
+              term: 'String',
+              value,
+              consumed: 1
+            }
           },
 
           Identifier({value}) {
             return {
               term: 'Reference',
-              value
+              value,
+              consumed: 1
             }
           }
         })(current)
@@ -44,33 +53,35 @@ function parser(node) {
             name: 'MainExpression',
           }, current[index])
           //postfix
-          if (current[index + 1] === '(') {
+          if (current[index + main.consumed] === '(') {
             let argumentIndex = 0
             const args = []
-            if (current[index + 1 + 1 + argumentIndex] !== ')') {
+            if (current[index + main.consumed + 1 + argumentIndex] !== ')') {
               while (true) {
                 const argument = parse({
                   name: 'Expression',
-                  index: index + 1 + 1 + argumentIndex
+                  index: index + main.consumed + 1 + argumentIndex
                 }, current)
                 args.push(argument)
-                if (index + 1 + 1 + argumentIndex + 1 >= current.length || current[index + 1 + 1 + argumentIndex + 1] === ')') {
+                const consumed = argument.consumed
+                if (index + main.consumed + 1 + argumentIndex + consumed >= current.length || current[index + main.consumed + 1 + argumentIndex + consumed] === ')') {
                   break
                 }
                 // skip comma
-                argumentIndex += 2
+                argumentIndex += consumed + 1
               }
             }
             return {
               term: 'Call',
               function: main,
-              arguments: args
+              arguments: args,
+              consumed: main.consumed + 1 + args.reduce((sum, arg) => sum + arg.consumed, 0) + Math.max(0, args.length - 1) + 1
             }
           }
           return main
         }
         return parse({
-          name: 'MainExpression',
+          name: 'MainExpression'
         }, current)
       }
     })(state)
