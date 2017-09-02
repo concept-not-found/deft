@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/concept-not-found/deft#readme",
   "dependencies": {
+    "pegjs": "0.10.0",
     "ramda": "0.24.1"
   },
   "devDependencies": {
