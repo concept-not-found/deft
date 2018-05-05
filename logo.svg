@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-<path d="m87.5 50v50a25 25 0 1 1-25-25h100" fill="none" stroke="#000" stroke-linecap="square" stroke-width="25"/>
-<path d="m137.5 50v50a25 25 0 0 0 25 25" fill="none" stroke="#000" stroke-linecap="square" stroke-width="25"/>
+<path d="M87.5 50v50a25 25 0 1 1-25-25h100M137.5 50v50a25 25 0 0 0 25 25" fill="none" stroke="#000" stroke-linecap="square" stroke-width="25"/>
 </svg>
